@@ -1,0 +1,154 @@
+.login-page {
+    height: calc(100vh - 72px); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+  }
+  
+  .login-card {
+    background: #e6e6e6;
+    padding: 60px;            
+    border-radius: 18px;
+    width: 480px;             
+    display: flex;
+    flex-direction: column;
+    gap: 28px;               
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  }
+  
+  .login-card p {
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .login-title {
+    text-align: center;
+    font-size: 34px;
+    font-weight: 700;
+    color: #5c4d8f;
+    margin-bottom: 4px;
+    animation: welcomeFade 1s ease-out;
+  }
+  
+  @keyframes welcomeFade {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .login-form input {
+    padding: 14px;
+    font-size: 15px;
+    width: 80%;     
+    align-self: center;  
+    border-radius: 8px;
+    border: none;
+    background: #d1d1d1;
+    color: #333;
+  }
+  
+  .login-form button {
+    margin-top: 10px;
+    padding: 12px;
+    width: 50%;          
+    align-self: center;  
+    border-radius: 10px;
+    border: none;
+    background: #5c4d8f;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .login-form button:hover {
+    background: #6d5fb0;
+  }
+  
+  .login-options {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .login-options a {
+    font-size: 13px;
+    color: #7e9c92;
+    text-decoration: none;
+    margin-right: 2rem;
+  }
+  
+  .login-options a:hover {
+    text-decoration: underline;
+  }
+  
+  .login-bottom-text {
+    font-size: 13px;
+    text-align: center;
+  }
+  
+  .login-bottom-text a {
+    color: #7e9c92;
+  }
+
+  .avatar-upload {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  .avatar-icon {
+    font-size: 100px;   
+    color: #7e9c92;
+    cursor: pointer;
+  }
+  
+  .avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .avatar-icon:hover {
+    transform: scale(1.05);
+    transition: 0.2s;
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .avatar-tooltip {
+    position: absolute;
+    bottom: -28px;
+    background: #d1d1d1;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: 0.2s ease;
+    pointer-events: none;
+  }
+  
+  .avatar-wrapper:hover .avatar-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
