@@ -1,12 +1,12 @@
-.login-page {
+.loginPage {
     height: calc(100vh - 72px); 
     display: flex;
     align-items: center;
     justify-content: center;
     background: #ffffff;
-  }
-  
-  .login-card {
+}
+
+.loginCard {
     background: #e6e6e6;
     padding: 60px;            
     border-radius: 18px;
@@ -15,52 +15,52 @@
     flex-direction: column;
     gap: 28px;               
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-  }
-  
-  .login-card p {
-    text-align: center;
-    font-size: 14px;
-  }
-  
-  .login-title {
+}
+
+.loginTitle {
     text-align: center;
     font-size: 34px;
     font-weight: 700;
     color: #5c4d8f;
     margin-bottom: 4px;
     animation: welcomeFade 1s ease-out;
-  }
-  
-  @keyframes welcomeFade {
-    from {
-      opacity: 0;
-      transform: translateY(-12px);
-    }
-  
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+}
 
-  .login-form {
+@keyframes welcomeFade {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loginForm {
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-  
-  .login-form input {
+}
+
+.inputField {
     padding: 14px;
     font-size: 15px;
-    width: 80%;     
-    align-self: center;  
+    width: 80%;
+    align-self: center;
     border-radius: 8px;
-    border: none;
+    border: 2px solid transparent;
     background: #d1d1d1;
-    color: #333;
+    color: #545454;
+    outline: none;
+    transition: all 0.2s ease;
   }
   
-  .login-form button {
+  .inputField:focus {
+    border-color: #5c4d8f;
+  }
+
+.submitBtn {
     margin-top: 10px;
     padding: 12px;
     width: 50%;          
@@ -71,84 +71,56 @@
     color: white;
     font-weight: 500;
     cursor: pointer;
-  }
-  
-  .login-form button:hover {
+}
+
+.submitBtn:hover {
     background: #6d5fb0;
-  }
-  
-  .login-options {
+}
+
+.options {
     display: flex;
     justify-content: flex-end;
-  }
-  
-  .login-options a {
+}
+
+.options a {
     font-size: 13px;
     color: #7e9c92;
     text-decoration: none;
     margin-right: 2rem;
-  }
-  
-  .login-options a:hover {
+}
+
+.options a:hover {
     text-decoration: underline;
-  }
-  
-  .login-bottom-text {
+}
+
+.bottomText {
     font-size: 13px;
     text-align: center;
-  }
-  
-  .login-bottom-text a {
-    color: #7e9c92;
-  }
+    color: #545454;
+}
 
-  .avatar-upload {
+.bottomText a {
+    color: #7e9c92;
+    text-decoration: none;
+}
+
+.bottomText a:hover {
+    text-decoration: underline;
+}
+
+.avatarUpload {
     display: flex;
     justify-content: center;
     margin-bottom: 10px;
-  }
-  
-  .avatar-icon {
+}
+
+.avatarIcon {
     font-size: 100px;   
     color: #7e9c92;
     cursor: pointer;
-  }
-  
-  .avatar-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    cursor: pointer;
-  }
-
-  .avatar-icon:hover {
-    transform: scale(1.05);
     transition: 0.2s;
-  }
+}
 
-  .avatar-wrapper {
-    position: relative;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .avatar-tooltip {
-    position: absolute;
-    bottom: -28px;
-    background: #d1d1d1;
-    color: white;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    opacity: 0;
-    transform: translateY(5px);
-    transition: 0.2s ease;
-    pointer-events: none;
-  }
-  
-  .avatar-wrapper:hover .avatar-tooltip {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.avatarIcon:hover {
+    transform: scale(1.05);
+}

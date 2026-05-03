@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
-import "../../styles/Login.css";
+import styles from "./RegisterPage.module.css";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -15,24 +15,22 @@ const RegisterPage = () => {
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-
     if (file) {
       setImage(URL.createObjectURL(file));
     }
   };
 
   return (
-    <main className="login-page">
-      <section className="login-card">
-        <div className="avatar-upload">
-          <label htmlFor="avatar-input" className="avatar-wrapper">
+    <main className={styles.registerPage}>
+      <section className={styles.card}>
+        <div className={styles.avatarUpload}>
+          <label htmlFor="avatar-input" className={styles.avatarWrapper}>
             {image ? (
-              <img src={image} alt="avatar" className="avatar-img" />
+              <img src={image} alt="avatar" className={styles.avatarImg} />
             ) : (
-              <FaUserCircle className="avatar-icon" />
+              <FaUserCircle className={styles.avatarIcon} />
             )}
-
-            <span className="avatar-tooltip">Upload photo</span>
+            <span className={styles.avatarTooltip}>Upload photo</span>
           </label>
 
           <input
@@ -44,15 +42,29 @@ const RegisterPage = () => {
           />
         </div>
 
-        <form className="login-form" onSubmit={handleRegister}>
-          <input type="text" placeholder="Username" />
-          <input type="email" placeholder="Email" />
-          <input type="password" placeholder="Password" />
+        <form className={styles.form} onSubmit={handleRegister}>
+          <input 
+            type="text" 
+            placeholder="Username" 
+            className={styles.inputField}
+          />
+          <input 
+            type="email" 
+            placeholder="Email" 
+            className={styles.inputField}
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            className={styles.inputField}
+          />
 
-          <button type="submit">Sign up</button>
+          <button type="submit" className={styles.submitBtn}>
+            Sign up
+          </button>
         </form>
 
-        <p className="login-bottom-text">
+        <p className={styles.bottomText}>
           Already have an account? <Link to="/login">Log in</Link>
         </p>
       </section>

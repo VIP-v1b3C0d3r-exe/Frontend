@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { FaHome, FaUserCircle, FaStar} from "react-icons/fa";
+import { FaHome, FaUserCircle, FaStar } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
 
 import logo from "../../assets/logo.svg";
-import "../../styles/header.css";
+import styles from "./Header.module.css";
 
 const Header = ({ isLoggedIn, setIsLoggedIn }) => {
   const [open, setOpen] = useState(false);
@@ -15,32 +15,35 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
     setOpen(false);
   };
 
-  return (
-    <header className="header">
-      <img src={logo} alt="logo" className="header-logo" />
+  const getNavLinkClass = ({ isActive }) => 
+    isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink;
 
-      <nav className="nav">
-        <NavLink to="/">
+  return (
+    <header className={styles.header}>
+      <img src={logo} alt="logo" className={styles.logo} />
+
+      <nav className={styles.nav}>
+        <NavLink to="/" className={getNavLinkClass}>
           <FaHome />
           <span>home</span>
         </NavLink>
 
         {isLoggedIn ? (
           <>
-            <NavLink to="/map">
+            <NavLink to="/map" className={getNavLinkClass}>
               <MdLocationOn />
               <span>map</span>
             </NavLink>
 
-            <NavLink to="/my-events">
+            <NavLink to="/my-events" className={getNavLinkClass}>
               <FaStar />
               <span>saved</span>
             </NavLink>
 
-            <div className="profile-wrapper">
+            <div className={styles.profileWrapper}>
               <button
                 type="button"
-                className="profile-trigger"
+                className={styles.profileTrigger}
                 onClick={() => setOpen(!open)}
               >
                 <FaUserCircle />
@@ -48,11 +51,10 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
               </button>
 
               {open && (
-                <div className="dropdown">
-
+                <div className={styles.dropdown}>
                   <button
                     type="button"
-                    className="dropdown-item"
+                    className={styles.dropdownItem}
                     onClick={handleLogout}
                   >
                     <FiLogOut />
@@ -63,7 +65,7 @@ const Header = ({ isLoggedIn, setIsLoggedIn }) => {
             </div>
           </>
         ) : (
-          <NavLink to="/login">
+          <NavLink to="/login" className={getNavLinkClass}>
             <FaUserCircle />
             <span>guest</span>
           </NavLink>

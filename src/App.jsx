@@ -32,7 +32,8 @@ function App() {
 
         <Route
           path="/map"
-          element={isLoggedIn ? <EventMapPage /> : <Navigate to="/login" />}
+          element={<EventMapPage/>}
+          // element={isLoggedIn ? <EventMapPage /> : <Navigate to="/login" />}
         />
 
         <Route
