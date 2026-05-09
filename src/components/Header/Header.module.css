@@ -1,0 +1,116 @@
+.header {
+    height: 72px;
+    background: #2f393b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+  }
+  
+  .logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    font-size: 24px;
+    color: white;
+  }
+  
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .navLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.06em;
+  
+    color: white;
+    text-decoration: none;
+  }
+  
+  .navLink svg {
+    font-size: 20px;
+    color: #7E9C92;
+    transition: transform 0.2s ease;
+  }
+  
+  .navLink:hover svg {
+    transform: scale(1.15);
+    color: #9bb8ae;
+  }
+
+  .activeLink svg {
+    color: #5C4D8F;
+    transform: scale(1.15);
+  }
+  
+  .profileWrapper {
+    position: relative;
+  }
+  
+  .dropdown {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    background: #2f393b;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 160px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+  
+  .dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 13px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .dropdownItem:hover {
+    background: #3b4547;
+  }
+  
+  .profileTrigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.06em;
+  }
+  
+  .profileTrigger svg {
+    font-size: 20px;
+    color: #7E9C92;
+    transition: transform 0.2s ease;
+  }
+  
+  .profileTrigger:hover svg {
+    transform: scale(1.15);
+  }

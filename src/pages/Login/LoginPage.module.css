@@ -1,0 +1,126 @@
+.loginPage {
+    height: calc(100vh - 72px); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.loginCard {
+    background: #e6e6e6;
+    padding: 60px;            
+    border-radius: 18px;
+    width: 480px;             
+    display: flex;
+    flex-direction: column;
+    gap: 28px;               
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
+.loginTitle {
+    text-align: center;
+    font-size: 34px;
+    font-weight: 700;
+    color: #5c4d8f;
+    margin-bottom: 4px;
+    animation: welcomeFade 1s ease-out;
+}
+
+@keyframes welcomeFade {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.inputField {
+    padding: 14px;
+    font-size: 15px;
+    width: 80%;
+    align-self: center;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background: #d1d1d1;
+    color: #545454;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  
+  .inputField:focus {
+    border-color: #5c4d8f;
+  }
+
+.submitBtn {
+    margin-top: 10px;
+    padding: 12px;
+    width: 50%;          
+    align-self: center;  
+    border-radius: 10px;
+    border: none;
+    background: #5c4d8f;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.submitBtn:hover {
+    background: #6d5fb0;
+}
+
+.options {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.options a {
+    font-size: 13px;
+    color: #7e9c92;
+    text-decoration: none;
+    margin-right: 2rem;
+}
+
+.options a:hover {
+    text-decoration: underline;
+}
+
+.bottomText {
+    font-size: 13px;
+    text-align: center;
+    color: #545454;
+}
+
+.bottomText a {
+    color: #7e9c92;
+    text-decoration: none;
+}
+
+.bottomText a:hover {
+    text-decoration: underline;
+}
+
+.avatarUpload {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.avatarIcon {
+    font-size: 100px;   
+    color: #7e9c92;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.avatarIcon:hover {
+    transform: scale(1.05);
+}

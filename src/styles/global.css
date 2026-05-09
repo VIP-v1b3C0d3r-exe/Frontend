@@ -1,0 +1,12 @@
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+    background: #121212;
+    color: white;
+  }
+:root{
+  color-scheme: light only;
+}
