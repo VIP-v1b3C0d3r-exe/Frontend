@@ -1,25 +1,19 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
 
-import Header from "./components/Header/Header";
 import HomePage from "./pages/Home/HomePage";
-import EventMapPage from "./pages/MapView/MapPage";
 import LoginPage from "./pages/Login/LoginPage";
-import EventDetailPage from "./pages/EventDetail/EventDetail";
 import RegisterPage from "./pages/Register/RegisterPage";
-import ProfilePage from "./pages/Profile/ProfilePage";
+import EventMapPage from "./pages/MapView/MapPage";
+import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
+import ProfilePage from "./pages/Profile/ProfilePage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <>
-      <Header 
-        isLoggedIn={isLoggedIn} 
-        setIsLoggedIn={setIsLoggedIn} 
-      />
-
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
 
@@ -30,11 +24,7 @@ function App() {
 
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route
-          path="/map"
-          element={<EventMapPage/>}
-          // element={isLoggedIn ? <EventMapPage /> : <Navigate to="/login" />}
-        />
+        <Route path="/map" element={<EventMapPage />} />
 
         <Route
           path="/events/:id"
@@ -51,7 +41,7 @@ function App() {
           element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />}
         />
       </Routes>
-    </>
+    </BrowserRouter>
   );
 }
 
