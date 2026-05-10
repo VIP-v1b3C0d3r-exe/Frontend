@@ -37,3 +37,7 @@ src/
 ## Environment Variables
 Create a .env file in the root:
 VITE_API_BASE_URL=http://localhost:8080
+
+## Reference
+
+- [Deploy](./docs/reference/deploy.md)

@@ -1,0 +1,35 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application on EC2
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            cd /home/ubuntu/Frontend
+
+            echo "Pulling latest changes..."
+            git pull origin develop
+
+            echo "Installing packages..."
+            npm install
+
+            echo "Running application..."
+            nohup npm run dev -- --host 0.0.0.0 > app.log 2>&1 &
+            disown
+
+            echo "Deployment completed!"
+  
