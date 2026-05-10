@@ -29,7 +29,8 @@ jobs:
             npm install
 
             echo "Running application..."
-            npm run dev -- --host 0.0.0.0
+            nohup npm run dev -- --host 0.0.0.0 > app.log 2>&1 &
+            disown
 
             echo "Deployment completed!"
   
