@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - feature/#118-implement-cd # test commit
 
 jobs:
   deploy:
@@ -23,7 +22,7 @@ jobs:
             cd /home/ubuntu/Frontend
 
             echo "Pulling latest changes..."
-            git pull origin feature/#118-implement-cd
+            git pull origin develop
 
             echo "Installing packages..."
             npm install
