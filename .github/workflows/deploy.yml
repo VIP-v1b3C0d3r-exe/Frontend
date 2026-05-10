@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - feature/#118-implement-cd
+      - feature/#118-implement-cd # test commit
 
 jobs:
   deploy:
