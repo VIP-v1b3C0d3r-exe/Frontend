@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
-
+import Header from "./components/Header/Header";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
@@ -14,6 +14,10 @@ function App() {
 
   return (
     <BrowserRouter>
+    <Header 
+        isLoggedIn={isLoggedIn} 
+        setIsLoggedIn={setIsLoggedIn} 
+      />
       <Routes>
         <Route path="/" element={<HomePage />} />
 
