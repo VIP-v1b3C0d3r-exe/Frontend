@@ -1,23 +1,46 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Header from "./components/Header/Header";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPassword/ForgotPasswordPage";
 import EventMapPage from "./pages/MapView/MapPage";
 import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
+import { getToken } from "./utils/token";
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [username, setUsername] = useState("guest");
+
+  useEffect(() => {
+    const token = getToken();
+
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const hideHeaderRoutes = ["/login", "/register", "/forgot-password"];
+
+  const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
 
   return (
-    <BrowserRouter>
-    <Header 
-        isLoggedIn={isLoggedIn} 
-        setIsLoggedIn={setIsLoggedIn} 
-      />
+    <>
+      {!shouldHideHeader && (
+        <Header
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+          profileImage={profileImage}
+          username={username}
+        />
+      )}
+
       <Routes>
         <Route path="/" element={<HomePage />} />
 
@@ -26,25 +49,54 @@ function App() {
           element={<LoginPage setIsLoggedIn={setIsLoggedIn} />}
         />
 
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/register"
+          element={
+            <RegisterPage
+              setProfileImage={setProfileImage}
+              setUsername={setUsername}
+            />
+          }
+        />
 
-        <Route path="/map" element={<EventMapPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        <Route
+          path="/map"
+          element={
+            isLoggedIn ? <EventMapPage /> : <Navigate to="/login" replace />
+          }
+        />
 
         <Route
           path="/events/:id"
-          element={isLoggedIn ? <EventDetailPage /> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? <EventDetailPage /> : <Navigate to="/login" replace />
+          }
         />
 
         <Route
           path="/my-events"
-          element={isLoggedIn ? <EventPage /> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? <EventPage /> : <Navigate to="/login" replace />
+          }
         />
 
         <Route
           path="/profile"
-          element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />
+          }
         />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
