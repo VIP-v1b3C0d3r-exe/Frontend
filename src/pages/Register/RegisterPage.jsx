@@ -2,21 +2,46 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
+import { registerUser } from "../../api/authApi";
+
 import styles from "./RegisterPage.module.css";
 
-const RegisterPage = () => {
+const RegisterPage = ({ setProfileImage, setUsername }) => {
   const navigate = useNavigate();
-  const [image, setImage] = useState(null);
 
-  const handleRegister = (event) => {
+  const [image, setImage] = useState(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleRegister = async (event) => {
     event.preventDefault();
-    navigate("/login");
+
+    try {
+      await registerUser({
+        username: name,
+        email,
+        password,
+      });
+
+      if (name.trim()) {
+        setUsername(name.trim());
+      }
+
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
+
     if (file) {
-      setImage(URL.createObjectURL(file));
+      const imageUrl = URL.createObjectURL(file);
+
+      setImage(imageUrl);
+      setProfileImage(imageUrl);
     }
   };
 
@@ -30,6 +55,7 @@ const RegisterPage = () => {
             ) : (
               <FaUserCircle className={styles.avatarIcon} />
             )}
+
             <span className={styles.avatarTooltip}>Upload photo</span>
           </label>
 
@@ -43,20 +69,28 @@ const RegisterPage = () => {
         </div>
 
         <form className={styles.form} onSubmit={handleRegister}>
-          <input 
-            type="text" 
-            placeholder="Username" 
+          <input
+            type="text"
+            placeholder="Username"
             className={styles.inputField}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
           />
-          <input 
-            type="email" 
-            placeholder="Email" 
+
+          <input
+            type="email"
+            placeholder="Email"
             className={styles.inputField}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
-          <input 
-            type="password" 
-            placeholder="Password" 
+
+          <input
+            type="password"
+            placeholder="Password"
             className={styles.inputField}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
           />
 
           <button type="submit" className={styles.submitBtn}>
