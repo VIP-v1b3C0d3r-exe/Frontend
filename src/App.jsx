@@ -1,17 +1,6 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
-
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-
 import Header from "./components/Header/Header";
-
-import { getToken } from "./utils/token";
-
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
@@ -20,6 +9,7 @@ import EventMapPage from "./pages/MapView/MapPage";
 import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
+import { getToken } from "./utils/token";
 
 function AppContent() {
   const location = useLocation();
