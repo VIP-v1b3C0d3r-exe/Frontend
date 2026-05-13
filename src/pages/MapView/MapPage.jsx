@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./MapPage.module.css";
 import FilterPanel from "../../components/FilterPanel/FilterPanel";
+import { fetchEvents } from "../../api/eventsApi";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
@@ -25,33 +27,20 @@ const createStarIcon = (color) =>
     popupAnchor: [0, -16],
   });
 
-const blueIcon = createStarIcon("#3b7edb");
+const blueIcon  = createStarIcon("#3b7edb");
 const greenIcon = createStarIcon("#2e8f2e");
 
-const MOCK_EVENTS = [
-  { id: 1, title: "Jazz Night", category: "Music", subcategory: "Jazz", status: "upcoming", lat: 54.6872, lng: 25.2797, time: "8:00 PM", location: "Old Town" },
-  { id: 2, title: "React Workshop", category: "Workshops", status: "current", lat: 54.6912, lng: 25.2701, time: "10:00 AM", location: "Tech Hub" },
-  { id: 3, title: "Dev Meetup", category: "Meetups", status: "current", lat: 54.6835, lng: 25.2860, time: "6:30 PM", location: "Coworking Space" },
-  { id: 4, title: "Street Food Fest", category: "Food", status: "upcoming", lat: 54.6795, lng: 25.2750, time: "12:00 PM", location: "Lukiškės Square" },
-  { id: 5, title: "Morning Yoga", category: "Active", status: "current", lat: 54.6950, lng: 25.2820, time: "7:00 AM", location: "Vingis Park" },
-  { id: 6, title: "Indie Concert", category: "Music", subcategory: "Indie", status: "upcoming", lat: 54.6860, lng: 25.2650, time: "9:00 PM", location: "Loftas" },
-  { id: 7, title: "UI/UX Workshop", category: "Workshops", status: "upcoming", lat: 54.6780, lng: 25.2900, time: "3:00 PM", location: "Design Studio" },
-  { id: 8, title: "Startup Meetup", category: "Meetups", status: "current", lat: 54.6920, lng: 25.2600, time: "5:00 PM", location: "Startup Hub" },
-];
-
-const CATEGORIES = ["Music", "Workshops", "Meetups", "Active", "Food"];
-
+// ---------------------------------------------------------------------------
+// Locate-me control (unchanged)
+// ---------------------------------------------------------------------------
 const LocateMe = () => {
   const map = useMap();
   const handleLocate = () => {
     map.locate({ setView: true, maxZoom: 15 });
     map.once("locationfound", (e) => {
       L.circleMarker(e.latlng, {
-        radius: 8,
-        fillColor: "#3b7edb",
-        color: "white",
-        weight: 2,
-        fillOpacity: 1,
+        radius: 8, fillColor: "#3b7edb",
+        color: "white", weight: 2, fillOpacity: 1,
       }).addTo(map);
     });
     map.once("locationerror", () => {
@@ -61,7 +50,8 @@ const LocateMe = () => {
 
   return (
     <button className={styles.locateBtn} onClick={handleLocate}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" strokeWidth="2.5">
         <circle cx="12" cy="12" r="3"/>
         <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
       </svg>
@@ -69,11 +59,53 @@ const LocateMe = () => {
   );
 };
 
-const MapPage = () => {
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(false);
+// ---------------------------------------------------------------------------
+// MapPage
+// ---------------------------------------------------------------------------
+const CATEGORIES = ["Music", "Workshops", "Meetups", "Active", "Food"];
 
+const MapPage = () => {
+  // ── UI state ──────────────────────────────────────────────────────────────
+  const [search,         setSearch]         = useState("");
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [panelOpen,      setPanelOpen]      = useState(false);
+
+  // ── Data state ────────────────────────────────────────────────────────────
+  const [events,  setEvents]  = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState(null);
+
+  // ── Fetch helpers ─────────────────────────────────────────────────────────
+
+  /**
+   * Load events from the API.
+   * `filterParams` is merged with whatever the FilterPanel provides
+   * (date_from / date_to / location come from the panel; category_id
+   *  is resolved from the active chip).
+   */
+  const loadEvents = useCallback(async (filterParams = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const results = await fetchEvents({
+        city: "Vilnius",   // default city — adjust or make dynamic as needed
+        ...filterParams,
+      });
+      setEvents(results);
+    } catch (err) {
+      console.error("Failed to load events:", err);
+      setError("Could not load events. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
+
+  // ── Panel / chip interaction (unchanged logic) ─────────────────────────
   const handleCategoryClick = (cat) => {
     if (activeCategory === cat && panelOpen) {
       setActiveCategory(null);
@@ -99,21 +131,34 @@ const MapPage = () => {
     setSearch("");
   };
 
-  const filteredEvents = MOCK_EVENTS.filter((event) => {
-    const matchesCategory = activeCategory ? event.category === activeCategory : true;
-    const matchesSearch =
-      event.title.toLowerCase().includes(search.toLowerCase()) ||
-      event.location.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
+  /**
+   * Called by FilterPanel whenever its filter state changes.
+   * The panel passes the resolved API-compatible params so MapPage
+   * can re-fetch and keep the map markers in sync.
+   *
+   * @param {Object} apiParams  e.g. { category_id, date_from, date_to }
+   */
+  const handleFilterChange = useCallback((apiParams) => {
+    loadEvents(apiParams);
+  }, [loadEvents]);
+
+  // ── Map markers: client-side text search on top of API results ───────────
+  const visibleEvents = events.filter((event) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(q) ||
+      event.location.toLowerCase().includes(q)
+    );
   });
 
+  // Render
   return (
     <div className={styles.mapPage}>
 
-      {/* Top bar — search visible when panel closed, category chips always */}
+      {/* Top bar */}
       <div className={`${styles.topBar} ${panelOpen ? styles.topBarShifted : ""}`}>
 
-        {/* Search bar — only shown when panel is closed */}
         {!panelOpen && (
           <div className={styles.searchBox}>
             <input
@@ -125,30 +170,30 @@ const MapPage = () => {
               className={styles.searchInput}
             />
             <button className={styles.searchBtn} onClick={handleSearchSubmit}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
             </button>
           </div>
         )}
 
-        {/* Category chips */}
-          <div className={styles.filters}>
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                className={`${styles.filterChip} ${activeCategory === cat ? styles.filterChipActive : ""}`}
-                onClick={() => handleCategoryClick(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        <div className={styles.filters}>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              className={`${styles.filterChip} ${activeCategory === cat ? styles.filterChipActive : ""}`}
+              onClick={() => handleCategoryClick(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Filter Panel */}
+      {/* Filter Panel — receives all events so it can do client-side sub-filtering */}
       <FilterPanel
-        events={MOCK_EVENTS}
+        events={events}
         activeCategory={activeCategory}
         search={search}
         onSearchChange={(val) => {
@@ -157,6 +202,8 @@ const MapPage = () => {
         }}
         onClose={handleClose}
         isOpen={panelOpen}
+        onFilterChange={handleFilterChange}
+        loading={loading}
       />
 
       {/* Map */}
@@ -172,7 +219,8 @@ const MapPage = () => {
         />
         <ZoomControl position="bottomright" />
         <LocateMe />
-        {filteredEvents.map((event) => (
+
+        {visibleEvents.map((event) => (
           <Marker
             key={event.id}
             position={[event.lat, event.lng]}
@@ -192,8 +240,12 @@ const MapPage = () => {
         ))}
       </MapContainer>
 
+      {/* Error toast */}
+      {error && <div className={styles.errorToast}>{error}</div>}
+
       <button className={styles.fab}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" strokeWidth="2.5">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
       </button>
