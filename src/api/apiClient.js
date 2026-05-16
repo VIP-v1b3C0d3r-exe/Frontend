@@ -1,35 +1,21 @@
-import { getToken } from "../utils/token";
+const API_URL = import.meta.env.VITE_API_URL;
 
-const API_URL = "http://localhost:8080";
+export async function apiClient(endpoint, options = {}) {
+  const token = localStorage.getItem("token");
 
-export const apiClient = async (
-  endpoint,
-  options = {}
-) => {
-  const token = getToken();
-
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
-    {
-      ...options,
-
-      headers: {
-        "Content-Type": "application/json",
-
-        ...(token && {
-          Authorization: `Bearer ${token}`,
-        }),
-
-        ...options.headers,
-      },
-    }
-  );
-
-  const data = await response.json();
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
 
   if (!response.ok) {
-    throw new Error(data.message || "API Error");
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error?.error?.message ?? `HTTP ${response.status}`);
   }
 
-  return data;
-};
+  return response.json();
+}

@@ -1,0 +1,120 @@
+/* Page shell */
+.page {
+    min-height: 100vh;
+    background: #e8eae5;
+    font-family: "Georgia", "Times New Roman", serif;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Main content */
+  .main {
+    flex: 1;
+    padding: 20px 80px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+    gap: 16px;
+  }
+  
+  /* Card */
+  .card {
+    position: relative;
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.11);
+  }
+  
+  .dismiss {
+    position: absolute;
+    top: 10px;
+    right: 13px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 17px;
+    color: rgba(60,60,60,0.45);
+    line-height: 1;
+    padding: 0 2px;
+    transition: color 0.15s;
+  }
+  
+  .dismiss:hover {
+    color: rgba(60,60,60,0.8);
+  }
+  
+  .cardInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    color: #2e3228;
+    line-height: 1.4;
+  }
+  
+  .label {
+    font-weight: 600;
+  }
+  
+  .viewBtn {
+    background: rgba(255,255,255,0.72);
+    border: none;
+    border-radius: 20px;
+    padding: 6px 22px;
+    font-size: 14px;
+    font-family: "Georgia", serif;
+    color: #3a3e35;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+    margin-left: 16px;
+    margin-bottom: 9px;
+    align-self: flex-end;
+  }
+  
+  .viewBtn:hover {
+    background: rgba(255,255,255,0.92);
+    transform: scale(1.03);
+  }
+  
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-top: 28px;
+  }
+  
+  .pageBtn {
+    background: none;
+    border: none;
+    font-family: "Georgia", serif;
+    font-size: 15px;
+    color: #4a5545;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: color 0.15s;
+    padding: 0;
+  }
+  
+  .pageBtn:hover {
+    color: #2b2d2b;
+  }
+  

@@ -30,9 +30,8 @@ const createStarIcon = (color) =>
 const blueIcon  = createStarIcon("#3b7edb");
 const greenIcon = createStarIcon("#2e8f2e");
 
-// ---------------------------------------------------------------------------
-// Locate-me control (unchanged)
-// ---------------------------------------------------------------------------
+// Locate-me control
+
 const LocateMe = () => {
   const map = useMap();
   const handleLocate = () => {
@@ -59,23 +58,22 @@ const LocateMe = () => {
   );
 };
 
-// ---------------------------------------------------------------------------
 // MapPage
-// ---------------------------------------------------------------------------
+
 const CATEGORIES = ["Music", "Workshops", "Meetups", "Active", "Food"];
 
 const MapPage = () => {
-  // ── UI state ──────────────────────────────────────────────────────────────
+  // UI state
   const [search,         setSearch]         = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
   const [panelOpen,      setPanelOpen]      = useState(false);
 
-  // ── Data state ────────────────────────────────────────────────────────────
+  // Data state
   const [events,  setEvents]  = useState([]);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
 
-  // ── Fetch helpers ─────────────────────────────────────────────────────────
+  // Fetch helpers ё
 
   /**
    * Load events from the API.
@@ -105,7 +103,7 @@ const MapPage = () => {
     loadEvents();
   }, [loadEvents]);
 
-  // ── Panel / chip interaction (unchanged logic) ─────────────────────────
+  // Panel / chip interaction (unchanged logic)
   const handleCategoryClick = (cat) => {
     if (activeCategory === cat && panelOpen) {
       setActiveCategory(null);
@@ -142,7 +140,7 @@ const MapPage = () => {
     loadEvents(apiParams);
   }, [loadEvents]);
 
-  // ── Map markers: client-side text search on top of API results ───────────
+  // Map markers: client-side text search on top of API results
   const visibleEvents = events.filter((event) => {
     if (!search) return true;
     const q = search.toLowerCase();
