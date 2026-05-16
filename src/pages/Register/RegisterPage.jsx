@@ -13,6 +13,7 @@ const RegisterPage = ({ setProfileImage, setUsername }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [age, setAge] = useState("");
 
   const handleRegister = async (event) => {
     event.preventDefault();
@@ -22,6 +23,7 @@ const RegisterPage = ({ setProfileImage, setUsername }) => {
         username: name,
         email,
         password,
+        age: Number(age),
       });
 
       if (name.trim()) {
@@ -92,7 +94,13 @@ const RegisterPage = ({ setProfileImage, setUsername }) => {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
-
+          <input
+            type="number"
+            placeholder="Age"
+            className={styles.inputField}
+            value={age}
+            onChange={(event) => setAge(event.target.value)}
+          />
           <button type="submit" className={styles.submitBtn}>
             Sign up
           </button>

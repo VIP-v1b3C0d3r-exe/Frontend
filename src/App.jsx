@@ -61,10 +61,16 @@ function AppContent() {
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-        <Route
+        {/* <Route
           path="/map"
           element={
             isLoggedIn ? <EventMapPage /> : <Navigate to="/login" replace />
+          }
+        /> */}
+
+        <Route
+          path="/map"
+          element={<EventMapPage/>
           }
         />
 
@@ -75,10 +81,16 @@ function AppContent() {
           }
         />
 
-        <Route
+        {/* <Route
           path="/my-events"
           element={
             isLoggedIn ? <EventPage /> : <Navigate to="/login" replace />
+          }
+        /> */}
+
+        <Route
+          path="/my-events"
+          element={<EventPage/>
           }
         />
 

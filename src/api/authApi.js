@@ -10,13 +10,14 @@ export const loginUser = async ({ email, password }) => {
   });
 };
 
-export const registerUser = async ({ username, email, password }) => {
+export const registerUser = async ({ username, email, password, age }) => {
   return apiClient("/auth/register", {
     method: "POST",
     body: JSON.stringify({
       username,
       email,
       password,
+      age,
     }),
   });
 };
