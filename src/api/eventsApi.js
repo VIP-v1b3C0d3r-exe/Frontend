@@ -30,11 +30,33 @@ export const fetchTags = async () => {
   return data.data ?? [];
 };
 
+export const createEvent = async (payload) => {
+  const data = await apiClient("/events", {
+    method: "POST",
+    body: JSON.stringify({
+      title:           payload.title,
+      description:     payload.description,
+      latitude:        payload.latitude,
+      longitude:       payload.longitude,
+      country:         payload.country,
+      city:            payload.city,
+      startTime:       payload.startTime,   // camelCase — backend requires this
+      endTime:         payload.endTime,
+      maxParticipants: payload.maxParticipants,
+      ageRestriction:  payload.ageRestriction,
+      imageUrl:        payload.imageUrl,
+      status:          payload.status ?? "upcoming",
+      userId:          payload.userId ?? 1,
+    }),
+  });
+  return data.data;
+};
+
 const normaliseEvent = (event) => {
-  const now = new Date();
+  const now   = new Date();
   const start = new Date(event.startTime);
-  const end = new Date(event.endTime);
-  let status = "upcoming";
+  const end   = new Date(event.endTime);
+  let status  = "upcoming";
   if (now >= start && now <= end) status = "current";
 
   return {
@@ -64,4 +86,12 @@ const formatTime = (isoString) => {
     minute: "2-digit",
     hour12: true,
   });
+};
+
+export const createTag = async (name) => {
+  const data = await apiClient("/tags", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+  return data.data; // { id, status } or { status }
 };

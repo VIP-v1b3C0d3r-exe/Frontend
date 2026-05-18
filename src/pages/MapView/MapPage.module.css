@@ -257,3 +257,37 @@
   .map :global(.leaflet-control-attribution) {
     display: none;
   }
+
+.mapPicking {
+  cursor: crosshair !important;
+}
+
+.pickingHint {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: #584D92;
+  color: white;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.errorToast {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: #c0392b;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+}

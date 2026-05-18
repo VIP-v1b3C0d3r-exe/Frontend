@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./MapPage.module.css";
 import FilterPanel from "../../components/FilterPanel/FilterPanel";
+import EventForm from "../../components/EventForm/EventForm"
 import { fetchEvents } from "../../api/eventsApi";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -30,7 +31,15 @@ const createStarIcon = (color) =>
 const blueIcon  = createStarIcon("#3b7edb");
 const greenIcon = createStarIcon("#2e8f2e");
 
-// Locate-me control
+// Picking marker icon
+const pickIcon = L.divIcon({
+  className: "",
+  html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#584D92">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+  </svg>`,
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+});
 
 const LocateMe = () => {
   const map = useMap();
@@ -58,35 +67,38 @@ const LocateMe = () => {
   );
 };
 
-// MapPage
+// Handles map clicks for location picking
+const MapClickHandler = ({ picking, onPick }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!picking) return;
+    const handler = (e) => onPick(e.latlng.lat, e.latlng.lng);
+    map.on("click", handler);
+    return () => map.off("click", handler);
+  }, [picking, map, onPick]);
+  return null;
+};
 
 const CATEGORIES = ["Music", "Workshops", "Meetups", "Active", "Food"];
 
 const MapPage = () => {
-  // UI state
   const [search,         setSearch]         = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
   const [panelOpen,      setPanelOpen]      = useState(false);
+  const [createOpen,     setCreateOpen]     = useState(false);
+  const [picking,        setPicking]        = useState(false);
+  const [pickedPos,      setPickedPos]      = useState(null);
 
-  // Data state
   const [events,  setEvents]  = useState([]);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
 
-  // Fetch helpers ё
-
-  /**
-   * Load events from the API.
-   * `filterParams` is merged with whatever the FilterPanel provides
-   * (date_from / date_to / location come from the panel; category_id
-   *  is resolved from the active chip).
-   */
   const loadEvents = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
       const results = await fetchEvents({
-        city: "Vilnius",   // default city — adjust or make dynamic as needed
+        city: "Vilnius",
         ...filterParams,
       });
       setEvents(results);
@@ -98,12 +110,8 @@ const MapPage = () => {
     }
   }, []);
 
-  // Initial load
-  useEffect(() => {
-    loadEvents();
-  }, [loadEvents]);
+  useEffect(() => { loadEvents(); }, [loadEvents]);
 
-  // Panel / chip interaction (unchanged logic)
   const handleCategoryClick = (cat) => {
     if (activeCategory === cat && panelOpen) {
       setActiveCategory(null);
@@ -111,36 +119,55 @@ const MapPage = () => {
     } else {
       setActiveCategory(cat);
       setPanelOpen(true);
+      setCreateOpen(false);
     }
   };
 
   const handleSearchSubmit = () => {
-    if (search.length > 0) setPanelOpen(true);
-    else if (!activeCategory) setPanelOpen(false);
+    setPanelOpen(true);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSearchSubmit();
   };
 
-  const handleClose = () => {
+  const handleFilterClose = () => {
     setPanelOpen(false);
     setActiveCategory(null);
     setSearch("");
   };
 
-  /**
-   * Called by FilterPanel whenever its filter state changes.
-   * The panel passes the resolved API-compatible params so MapPage
-   * can re-fetch and keep the map markers in sync.
-   *
-   * @param {Object} apiParams  e.g. { category_id, date_from, date_to }
-   */
   const handleFilterChange = useCallback((apiParams) => {
     loadEvents(apiParams);
   }, [loadEvents]);
 
-  // Map markers: client-side text search on top of API results
+  const handleFabClick = () => {
+    setCreateOpen(true);
+    setPanelOpen(false);
+    setActiveCategory(null);
+  };
+
+  const handleCreateClose = (signal) => {
+    if (signal === "picking") {
+      setPicking(true);
+      setCreateOpen(false);
+    } else {
+      setCreateOpen(false);
+      setPicking(false);
+      setPickedPos(null);
+    }
+  };
+
+  const handleMapPick = useCallback((lat, lng) => {
+    setPickedPos({ lat, lng });
+    setPicking(false);
+    setCreateOpen(true);
+  }, []);
+
+  const handleCreated = () => {
+    loadEvents();
+  };
+
   const visibleEvents = events.filter((event) => {
     if (!search) return true;
     const q = search.toLowerCase();
@@ -150,14 +177,14 @@ const MapPage = () => {
     );
   });
 
-  // Render
+  const anyPanelOpen = panelOpen || createOpen;
+
   return (
     <div className={styles.mapPage}>
 
       {/* Top bar */}
-      <div className={`${styles.topBar} ${panelOpen ? styles.topBarShifted : ""}`}>
-
-        {!panelOpen && (
+      <div className={`${styles.topBar} ${anyPanelOpen ? styles.topBarShifted : ""}`}>
+        {!anyPanelOpen && (
           <div className={styles.searchBox}>
             <input
               type="text"
@@ -175,7 +202,6 @@ const MapPage = () => {
             </button>
           </div>
         )}
-
         <div className={styles.filters}>
           {CATEGORIES.map((cat) => (
             <button
@@ -189,7 +215,7 @@ const MapPage = () => {
         </div>
       </div>
 
-      {/* Filter Panel — receives all events so it can do client-side sub-filtering */}
+      {/* Filter Panel */}
       <FilterPanel
         events={events}
         activeCategory={activeCategory}
@@ -198,17 +224,32 @@ const MapPage = () => {
           setSearch(val);
           if (!val && !activeCategory) setPanelOpen(false);
         }}
-        onClose={handleClose}
+        onClose={handleFilterClose}
         isOpen={panelOpen}
         onFilterChange={handleFilterChange}
         loading={loading}
       />
 
+      {/* Create Event Panel */}
+      <EventForm
+        isOpen={createOpen}
+        onClose={handleCreateClose}
+        onCreated={handleCreated}
+        pickedPosition={pickedPos}
+      />
+
+      {/* Picking hint */}
+      {picking && (
+        <div className={styles.pickingHint}>
+          Click anywhere on the map to set event location
+        </div>
+      )}
+
       {/* Map */}
       <MapContainer
         center={[54.6872, 25.2797]}
         zoom={14}
-        className={styles.map}
+        className={`${styles.map} ${picking ? styles.mapPicking : ""}`}
         zoomControl={false}
       >
         <TileLayer
@@ -217,6 +258,12 @@ const MapPage = () => {
         />
         <ZoomControl position="bottomright" />
         <LocateMe />
+        <MapClickHandler picking={picking} onPick={handleMapPick} />
+
+        {/* Picked location marker */}
+        {pickedPos && (
+          <Marker position={[pickedPos.lat, pickedPos.lng]} icon={pickIcon} />
+        )}
 
         {visibleEvents.map((event) => (
           <Marker
@@ -238,10 +285,10 @@ const MapPage = () => {
         ))}
       </MapContainer>
 
-      {/* Error toast */}
       {error && <div className={styles.errorToast}>{error}</div>}
 
-      <button className={styles.fab}>
+      {/* FAB */}
+      <button className={styles.fab} onClick={handleFabClick}>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" strokeWidth="2.5">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>

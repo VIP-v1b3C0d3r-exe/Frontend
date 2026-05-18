@@ -5,14 +5,17 @@ import styles from "./TagSearch.module.css";
  * TagSearch
  * ─────────
  * Props:
- *   tags          – all available tags from API [{ name: "Outdoor" }, ...]
- *   selectedTags  – array of selected tag names
+ *   tags          – all available tags from API [{ id, name }, ...]
+ *   selectedTags  – array of selected tag names (strings)
  *   onTagsChange  – (newSelectedTags: string[]) => void
+ *   onCreateTag   – optional: (name: string) => Promise<{ id, name }>
+ *                   if provided, shows "Create #name" option when no match found
  */
-const TagSearch = ({ tags = [], selectedTags = [], onTagsChange }) => {
-  const [input, setInput] = useState("");
-  const [focused, setFocused] = useState(false);
-  const inputRef = useRef(null);
+const TagSearch = ({ tags = [], selectedTags = [], onTagsChange, onCreateTag }) => {
+  const [input,    setInput]    = useState("");
+  const [focused,  setFocused]  = useState(false);
+  const [creating, setCreating] = useState(false);
+  const inputRef   = useRef(null);
   const dropdownRef = useRef(null);
 
   const suggestions = tags.filter(
@@ -21,7 +24,12 @@ const TagSearch = ({ tags = [], selectedTags = [], onTagsChange }) => {
       !selectedTags.includes(t.name)
   );
 
-  const showDropdown = focused && input.length > 0 && suggestions.length > 0;
+  const exactMatch = tags.some(
+    (t) => t.name.toLowerCase() === input.toLowerCase()
+  );
+
+  const showDropdown = focused && input.length > 0 &&
+    (suggestions.length > 0 || (onCreateTag && !exactMatch));
 
   const addTag = (name) => {
     onTagsChange([...selectedTags, name]);
@@ -33,15 +41,25 @@ const TagSearch = ({ tags = [], selectedTags = [], onTagsChange }) => {
     onTagsChange(selectedTags.filter((t) => t !== name));
   };
 
+  const handleCreate = async () => {
+    if (!onCreateTag || creating) return;
+    setCreating(true);
+    try {
+      const newTag = await onCreateTag(input.trim());
+      if (newTag) addTag(input.trim());
+    } catch (e) {
+      console.error("Failed to create tag:", e);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   useEffect(() => {
     const handler = (e) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target) &&
-        !inputRef.current.contains(e.target)
-      ) {
-        setFocused(false);
-      }
+        dropdownRef.current && !dropdownRef.current.contains(e.target) &&
+        inputRef.current && !inputRef.current.contains(e.target)
+      ) setFocused(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -51,7 +69,6 @@ const TagSearch = ({ tags = [], selectedTags = [], onTagsChange }) => {
     <div className={styles.wrapper}>
       <p className={styles.label}>Tags</p>
 
-      {/* Input */}
       <div className={styles.inputWrap}>
         <svg className={styles.searchIcon} xmlns="http://www.w3.org/2000/svg"
              width="13" height="13" viewBox="0 0 24 24"
@@ -70,26 +87,32 @@ const TagSearch = ({ tags = [], selectedTags = [], onTagsChange }) => {
         />
       </div>
 
-      {/* Dropdown suggestions */}
       {showDropdown && (
         <div className={styles.dropdown} ref={dropdownRef}>
           {suggestions.map((tag) => (
             <button
               key={tag.name}
               className={styles.suggestion}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                addTag(tag.name);
-              }}
+              onMouseDown={(e) => { e.preventDefault(); addTag(tag.name); }}
             >
               <span className={styles.suggestionHash}>#</span>
               {tag.name}
             </button>
           ))}
+
+          {onCreateTag && !exactMatch && input.trim().length > 0 && (
+            <button
+              className={`${styles.suggestion} ${styles.createSuggestion}`}
+              onMouseDown={(e) => { e.preventDefault(); handleCreate(); }}
+              disabled={creating}
+            >
+              <span className={styles.suggestionHash}>+</span>
+              {creating ? "Creating..." : `Create "#${input.trim()}"`}
+            </button>
+          )}
         </div>
       )}
 
-      {/* Selected tag bubbles */}
       {selectedTags.length > 0 && (
         <div className={styles.bubbles}>
           {selectedTags.map((name) => (
@@ -100,9 +123,7 @@ const TagSearch = ({ tags = [], selectedTags = [], onTagsChange }) => {
                 className={styles.bubbleRemove}
                 onClick={() => removeTag(name)}
                 aria-label={`Remove ${name}`}
-              >
-                ×
-              </button>
+              >×</button>
             </span>
           ))}
         </div>
