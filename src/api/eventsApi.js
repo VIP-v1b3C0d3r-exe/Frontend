@@ -1,8 +1,5 @@
 import { apiClient } from "./apiClient";
 
-/**
- * Fetch a list of events with optional filters.
- */
 export const fetchEvents = async (params = {}) => {
   const query = new URLSearchParams();
   if (params.city)        query.set("city",        params.city);
@@ -18,51 +15,47 @@ export const fetchEvents = async (params = {}) => {
   return (data.data ?? []).map(normaliseEvent);
 };
 
-/**
- * Fetch a single event by id.
- */
 export const fetchEvent = async (id) => {
   const data = await apiClient(`/events/${id}`);
   return normaliseEvent(data.data);
 };
 
-/**
- * Fetch all categories.
- * Returns: [{ id, name }, ...]
- */
 export const fetchCategories = async () => {
   const data = await apiClient("/categories");
   return data.data ?? [];
 };
 
-/**
- * Normalise API event shape → UI shape.
- *
- * API returns: id, title, description, latitude, longitude,
- *              start_time, end_time, status, image_url, created_by, created_at
- *
- * NOTE: API does not return city/address or category directly on the event.
- * - location: built from whatever address fields exist (ask backend to add if needed)
- * - category: not in event response — defaults to "Other" until backend adds it
- */
-const normaliseEvent = (event) => ({
-  id:          event.id,
-  title:       event.title,
-  description: event.description ?? "",
-  lat:         event.latitude,
-  lng:         event.longitude,
-  time:        formatTime(event.startTime),      // ← было start_time
-  startTime:   event.startTime,
-  endTime:     event.endTime,
-  location:    event.city ?? event.country ?? "", // ← city теперь есть!
-  status:      event.status ?? "upcoming",
-  image_url:   event.imageUrl ?? null,            // ← было image_url
-  category:    event.category ?? "Other",
-  subcategory: event.subcategory ?? null,
-  createdBy:   event.createdAt ?? null,
-});
+export const fetchTags = async () => {
+  const data = await apiClient("/tags");
+  return data.data ?? [];
+};
 
-/** "2026-06-01T20:00:00Z" → "8:00 PM" */
+const normaliseEvent = (event) => {
+  const now = new Date();
+  const start = new Date(event.startTime);
+  const end = new Date(event.endTime);
+  let status = "upcoming";
+  if (now >= start && now <= end) status = "current";
+
+  return {
+    id:          event.id,
+    title:       event.title,
+    description: event.description ?? "",
+    lat:         event.latitude,
+    lng:         event.longitude,
+    time:        formatTime(event.startTime),
+    startTime:   event.startTime,
+    endTime:     event.endTime,
+    location:    event.city ?? event.country ?? "",
+    city:        event.city ?? "",
+    country:     event.country ?? "",
+    status,
+    image_url:   event.imageUrl ?? null,
+    tagIds:      event.tagIds ?? [],
+    categoryIds: event.categoryIds ?? [],
+  };
+};
+
 const formatTime = (isoString) => {
   if (!isoString) return "";
   const date = new Date(isoString);
