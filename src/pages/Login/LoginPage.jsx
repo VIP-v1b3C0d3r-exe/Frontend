@@ -2,7 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 
 import { loginUser } from "../../api/authApi";
-import { setToken } from "../../utils/token";
+import { setRefreshToken, setToken } from "../../utils/token";
 
 import styles from "./LoginPage.module.css";
 
@@ -11,25 +11,51 @@ const LoginPage = ({ setIsLoggedIn }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    setErrorMessage("");
 
     try {
-      const data = await loginUser({
+      const response = await loginUser({
         email,
         password,
       });
 
-      console.log(data);
+      console.log("Login response:", response);
 
-      setToken(data.data.access_token);
+      const accessToken =
+        response?.data?.access_token ||
+        response?.data?.accessToken ||
+        response?.data?.token ||
+        response?.access_token ||
+        response?.accessToken ||
+        response?.token;
+
+      const refreshToken =
+        response?.data?.refresh_token ||
+        response?.data?.refreshToken ||
+        response?.refresh_token ||
+        response?.refreshToken;
+
+      if (!accessToken) {
+        setErrorMessage("Login failed. Access token was not received.");
+        return;
+      }
+
+      setToken(accessToken);
+
+      if (refreshToken) {
+        setRefreshToken(refreshToken);
+      }
 
       setIsLoggedIn(true);
 
       navigate("/map");
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
+      setErrorMessage("Incorrect email or password.");
     }
   };
 
@@ -59,6 +85,10 @@ const LoginPage = ({ setIsLoggedIn }) => {
             onChange={(event) => setPassword(event.target.value)}
           />
 
+          {errorMessage && (
+            <p className={styles.errorMessage}>{errorMessage}</p>
+          )}
+
           <div className={styles.options}>
             <Link to="/forgot-password" className={styles.forgotPassword}>
               Forgot password?
@@ -71,8 +101,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
         </form>
 
         <p className={styles.bottomText}>
-          Don&apos;t have an account?{" "}
-          <Link to="/register">Register</Link>
+          Don&apos;t have an account? <Link to="/register">Register</Link>
         </p>
       </section>
     </main>
