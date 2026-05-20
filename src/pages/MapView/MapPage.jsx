@@ -98,7 +98,7 @@ const MapPage = () => {
     setError(null);
     try {
       const results = await fetchEvents({
-        city: "Vilnius",
+        // city: "Vilnius",
         ...filterParams,
       });
       setEvents(results);
@@ -223,6 +223,7 @@ const MapPage = () => {
         onSearchChange={(val) => {
           setSearch(val);
           if (!val && !activeCategory) setPanelOpen(false);
+          console.log("events in FilterPanel:", events.length, events);
         }}
         onClose={handleFilterClose}
         isOpen={panelOpen}

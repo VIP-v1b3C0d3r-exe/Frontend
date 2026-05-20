@@ -75,73 +75,72 @@ const FilterPanel = ({
   }, []);
 
   // When activeCategory or categoryMap changes → emit category_id to MapPage
+  const mounted = useRef(false);
+
   useEffect(() => {
-    if (!onFilterChange) return;
-    const params = {};
-    if (activeCategory && categoryMap[activeCategory]) {
-      params.category_id = categoryMap[activeCategory];
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
     }
+    if (!onFilterChange || Object.keys(categoryMap).length === 0) return;
+    const params = {};
     if (locationFilter) params.city = locationFilter;
     if (dateFilter) {
       params.date_from = dateFilter;
       params.date_to   = dateFilter;
     }
     onFilterChange(params);
-  }, [activeCategory, categoryMap]);
+  }, [activeCategory, categoryMap, locationFilter, dateFilter]);
 
-  const buildAndEmit = useCallback((overrides = {}) => {
-    if (!onFilterChange) return;
-    const state = { locationFilter, dateFilter, ...overrides };
-    const params = {};
-
-    if (activeCategory && categoryMap[activeCategory]) {
-      params.category_id = categoryMap[activeCategory];
-    }
-    if (state.locationFilter) params.city = state.locationFilter;
-    if (state.dateFilter) {
-      params.date_from = state.dateFilter;
-      params.date_to   = state.dateFilter;
-    }
-    onFilterChange(params);
-  }, [locationFilter, dateFilter, activeCategory, categoryMap, onFilterChange]);
-
-  const handleLocationChange = (val) => {
-    setLocationFilter(val);
-    buildAndEmit({ locationFilter: val });
-  };
-
-  const handleDateChange = (val) => {
-    setDateFilter(val);
-    buildAndEmit({ dateFilter: val });
-  };
+  const handleLocationChange = (val) => setLocationFilter(val);
+  const handleDateChange     = (val) => setDateFilter(val);
 
   const handleTagsChange = (newTags) => {
     setSelectedTags(newTags);
-    // When backend supports tag_id filtering via API, add here:
-    // buildAndEmit({ tag_id: newTags[0]?.id })
-  };
+  }
 
   // Client-side filtering on top of API results
   const filtered = events.filter((event) => {
     const matchesSearch =
       !search ||
       event.title.toLowerCase().includes(search.toLowerCase()) ||
-      event.location.toLowerCase().includes(search.toLowerCase());
+      (event.location ?? "")
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      (event.address ?? "")
+        .toLowerCase()
+        .includes(search.toLowerCase())
 
-    const matchesCategory = !activeCategory || 
-      (event.categoryIds && event.categoryIds.includes(categoryMap[activeCategory]));
-  
+    const matchesCategory = !activeCategory ||
+        (event.categoryIds && event.categoryIds.includes(categoryMap[activeCategory]));
+
     const matchesTags =
       selectedTags.length === 0 ||
-      selectedTags.some((t) => (event.tagIds ?? []).includes(t.id));
+      selectedTags.some((selectedName) => {
+        const tag = tags.find((t) => t.name === selectedName);
+        console.log("tag:", selectedName, "→ id:", tag?.id, "| event", event.id, "tagIds:", event.tagIds);
+        return tag && (event.tagIds ?? []).includes(tag.id);
+      });
   
-    const matchesTime = timeOfDay
-      ? timeOfDay === "AM"
-        ? parseInt(event.time) < 12
-        : parseInt(event.time) >= 12
-      : true;
+    const matchesTime = timeOfDay ? (() => {
+      const hour = new Date(event.startTime).getHours();
+      return timeOfDay === "AM" ? hour < 12 : hour >= 12;
+    })() : true;
   
-    return matchesSearch && matchesCategory && matchesTags && matchesTime;
+    // Location filter — matches city OR country (client-side)
+    const matchesLocation =
+      !locationFilter ||
+      (event.address ?? "")
+        .toLowerCase()
+        .includes(locationFilter.toLowerCase()) ||
+      (event.city ?? "")
+        .toLowerCase()
+        .includes(locationFilter.toLowerCase()) ||
+      (event.country ?? "")
+        .toLowerCase()
+        .includes(locationFilter.toLowerCase());
+  
+    return matchesSearch && matchesCategory && matchesTags && matchesTime && matchesLocation;
   });
 
   return (
@@ -173,12 +172,17 @@ const FilterPanel = ({
         <FilterDropdown label="Time" activeCount={(dateFilter ? 1 : 0) + (timeOfDay ? 1 : 0)}>
           <div className={styles.dropdownContent}>
             <label className={styles.dropdownLabel}>Date</label>
-            <input
-              type="date"
-              className={styles.dropdownInput}
-              value={dateFilter}
-              onChange={(e) => handleDateChange(e.target.value)}
-            />
+            <div className={styles.dateInputRow}>
+              <input
+                type="date"
+                className={styles.dropdownInput}
+                value={dateFilter}
+                onChange={(e) => handleDateChange(e.target.value)}
+              />
+              {dateFilter && (
+                <button className={styles.clearDate} onClick={() => handleDateChange("")}>✕</button>
+              )}
+            </div>
             <div className={styles.ampmRow}>
               <button
                 className={`${styles.ampmBtn} ${timeOfDay === "AM" ? styles.ampmActive : ""}`}

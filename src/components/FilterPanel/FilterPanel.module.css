@@ -382,3 +382,23 @@
     font-size: 13px;
     color: #666;
   }
+  
+  .dateInputRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .clearDate {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aaa;
+    font-size: 13px;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  
+  .clearDate:hover {
+    color: #555;
+  }

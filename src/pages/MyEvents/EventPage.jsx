@@ -14,19 +14,19 @@ const STATUS_LABEL = {
   "created by you": "created by you",
 };
 
-// Mock data — replace with real API call
-const MOCK_EVENTS = [
-  { id: 1,  title: "Sunset Jazz Session",    status: "current",        time: "2pm", city: "Vilnius", address: "Užupis Café" },
-  { id: 2,  title: "Tech Meetup Downtown",   status: "upcoming",       time: "6pm", city: "Vilnius", address: "Cowork Hub" },
-  { id: 3,  title: "Yoga in the Park",       status: "upcoming",       time: "8am", city: "Vilnius", address: "Vingis Park" },
-  { id: 4,  title: "Street Food Festival",   status: "current",        time: "12pm", city: "Vilnius", address: "Old Town Square" },
-  { id: 5,  title: "Photography Workshop",   status: "created by you", time: "3pm", city: "Vilnius", address: "Art House" },
-  { id: 6,  title: "Classical Concert",      status: "current",        time: "7pm", city: "Vilnius", address: "Philharmonic Hall" },
-  { id: 7,  title: "Running Club",           status: "upcoming",       time: "7am", city: "Vilnius", address: "Neris Riverside" },
-  { id: 8,  title: "Vegan Market",           status: "upcoming",       time: "10am", city: "Vilnius", address: "Halės Market" },
-  { id: 9,  title: "Design Thinking Lab",    status: "created by you", time: "2pm", city: "Vilnius", address: "Startup Hub" },
-  { id: 10, title: "Electronic Night",       status: "upcoming",       time: "10pm", city: "Vilnius", address: "Loft Club" },
-];
+// // Mock data — replace with real API call
+// const MOCK_EVENTS = [
+//   { id: 1,  title: "Sunset Jazz Session",    status: "current",        time: "2pm", city: "Vilnius", address: "Užupis Café" },
+//   { id: 2,  title: "Tech Meetup Downtown",   status: "upcoming",       time: "6pm", city: "Vilnius", address: "Cowork Hub" },
+//   { id: 3,  title: "Yoga in the Park",       status: "upcoming",       time: "8am", city: "Vilnius", address: "Vingis Park" },
+//   { id: 4,  title: "Street Food Festival",   status: "current",        time: "12pm", city: "Vilnius", address: "Old Town Square" },
+//   { id: 5,  title: "Photography Workshop",   status: "created by you", time: "3pm", city: "Vilnius", address: "Art House" },
+//   { id: 6,  title: "Classical Concert",      status: "current",        time: "7pm", city: "Vilnius", address: "Philharmonic Hall" },
+//   { id: 7,  title: "Running Club",           status: "upcoming",       time: "7am", city: "Vilnius", address: "Neris Riverside" },
+//   { id: 8,  title: "Vegan Market",           status: "upcoming",       time: "10am", city: "Vilnius", address: "Halės Market" },
+//   { id: 9,  title: "Design Thinking Lab",    status: "created by you", time: "2pm", city: "Vilnius", address: "Startup Hub" },
+//   { id: 10, title: "Electronic Night",       status: "upcoming",       time: "10pm", city: "Vilnius", address: "Loft Club" },
+// ];
 
 const PAGE_SIZE = 8;
 

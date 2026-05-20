@@ -2,35 +2,53 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./EventForm.module.css";
 import TagSearch from "../TagSearch/TagSearch";
 import { fetchCategories, fetchTags, createEvent, createTag } from "../../api/eventsApi";
+import { reverseGeocode } from "../../utils/geocode";
 
 const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
   const [categories,    setCategories]    = useState([]);
   const [tags,          setTags]          = useState([]);
-  const [selectedTagNames, setSelectedTagNames] = useState([]); // strings for TagSearch
+  const [selectedTagNames, setSelectedTagNames] = useState([]);
   const [imageFile,     setImageFile]     = useState(null);
   const [imagePreview,  setImagePreview]  = useState(null);
   const [submitting,    setSubmitting]    = useState(false);
   const [error,         setError]         = useState(null);
 
   const [form, setForm] = useState({
-    title:           "",
-    description:     "",
-    category_id:     "",
+    title: "",
+    description: "",
+    category_id: "",
     age_restriction: 0,
-    country:         "",
-    city:            "",
-    lat:             null,
-    lng:             null,
-    date:            "",
-    start_time:      "12:00",
-    end_time:        "16:00",
+    country: "",
+    city: "",
+    address: "",
+    lat: null,
+    lng: null,
+    date: "",
+    start_time: "12:00",
+    end_time: "16:00",
     max_participants: 10,
   });
 
   useEffect(() => {
-    if (pickedPosition) {
-      setForm(f => ({ ...f, lat: pickedPosition.lat, lng: pickedPosition.lng }));
-    }
+    if (!pickedPosition) return;
+  
+    const loadAddress = async () => {
+      const geo = await reverseGeocode(
+        pickedPosition.lat,
+        pickedPosition.lng
+      );
+  
+      setForm(f => ({
+        ...f,
+        lat: pickedPosition.lat,
+        lng: pickedPosition.lng,
+        address: geo?.street ?? "",
+        city: geo?.city ?? "",
+        country: geo?.country ?? "",
+      }));
+    };
+  
+    loadAddress();
   }, [pickedPosition]);
 
   useEffect(() => {
@@ -52,51 +70,61 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
       setError("Please fill in title, date and times.");
       return;
     }
+  
     setSubmitting(true);
     setError(null);
+  
     try {
       const startTime = `${form.date}T${form.start_time}:00`;
       const endTime   = `${form.date}T${form.end_time}:00`;
 
+      const tagIds = selectedTagNames
+        .map((name) => tags.find((t) => t.name === name)?.id)
+        .filter(Boolean);
+  
       const payload = {
-        title:           form.title,
-        description:     form.description,
-        latitude:        form.lat ?? 54.6872,
-        longitude:       form.lng ?? 25.2797,
-        country:         form.country || "Lithuania",
-        city:            form.city || "Vilnius",
+        title: form.title,
+        description: form.description,
+        latitude: form.lat ?? 54.6872,
+        longitude: form.lng ?? 25.2797,
+        country: form.country,
+        city: form.city,
         startTime,
         endTime,
         maxParticipants: Number(form.max_participants),
-        ageRestriction:  Number(form.age_restriction),
-        imageUrl:        imagePreview ?? null,
-        status:          "upcoming",
+        ageRestriction: Number(form.age_restriction),
+        imageUrl: imagePreview ?? null,
+        categoryIds: form.category_id ? [Number(form.category_id)] : [],
+        tagIds,  // ← сразу в теле
       };
-
+  
       const newEvent = await createEvent(payload);
-
-      // Assign category
-      if (form.category_id && newEvent?.id) {
-        await fetch(`/api/events/${newEvent.id}/categories/${form.category_id}`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }).catch(e => console.warn("Category assignment failed:", e));
-      }
-
-      // Assign tags by name → find id
-      const tagIds = selectedTagNames
-        .map(name => tags.find(t => t.name === name)?.id)
-        .filter(Boolean);
-
-      for (const tagId of tagIds) {
-        await fetch(`/api/events/${newEvent.id}/tags/${tagId}`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }).catch(e => console.warn("Tag assignment failed:", e));
-      }
-
+  
+      // RESET
+      setForm({
+        title: "",
+        description: "",
+        category_id: "",
+        age_restriction: 0,
+        country: "",
+        city: "",
+        address: "",
+        lat: null,
+        lng: null,
+        date: "",
+        start_time: "12:00",
+        end_time: "16:00",
+        max_participants: 10,
+      });
+  
+      setSelectedTagNames([]);
+      setImageFile(null);
+      setImagePreview(null);
+      setError(null);
+  
       onCreated?.();
       onClose();
+  
     } catch (err) {
       setError(err.message ?? "Failed to create event.");
     } finally {
@@ -203,13 +231,21 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
           <div className={styles.locationInputs}>
             <input
               className={styles.input}
-              placeholder="Country, City"
-              value={`${form.country}${form.city ? ", " + form.city : ""}`}
-              onChange={e => {
-                const parts = e.target.value.split(",").map(s => s.trim());
-                set("country", parts[0] ?? "");
-                set("city", parts[1] ?? "");
-              }}
+              placeholder="Country"
+              value={form.country}
+              onChange={e => set("country", e.target.value)}
+            />
+            <input
+              className={styles.input}
+              placeholder="City"
+              value={form.city}
+              onChange={e => set("city", e.target.value)}
+            />
+            <input
+              className={styles.input}
+              placeholder="Address (optional)"
+              value={form.address ?? ""}
+              onChange={e => set("address", e.target.value)}
             />
             {form.lat && form.lng && (
               <p className={styles.coordsHint}>

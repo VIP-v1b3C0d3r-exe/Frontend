@@ -6,8 +6,9 @@ export const fetchEvents = async (params = {}) => {
   if (params.country)     query.set("country",     params.country);
   if (params.category_id) query.set("category_id", params.category_id);
   if (params.tag_id)      query.set("tag_id",      params.tag_id);
-  if (params.date_from)   query.set("date_from",   params.date_from);
-  if (params.date_to)     query.set("date_to",     params.date_to);
+  if (params.date_from)   query.set("date_from", `${params.date_from}T00:00:00`);
+  if (params.date_to)     query.set("date_to",   `${params.date_to}T23:59:59`);
+  
   query.set("limit",  params.limit  ?? 50);
   query.set("offset", params.offset ?? 0);
 
@@ -31,25 +32,30 @@ export const fetchTags = async () => {
 };
 
 export const createEvent = async (payload) => {
+  const body = {
+    title: payload.title,
+    description: payload.description,
+    latitude: payload.latitude,
+    longitude: payload.longitude,
+    country: payload.country,
+    city: payload.city,
+    startTime: payload.startTime,
+    endTime: payload.endTime,
+    maxParticipants: payload.maxParticipants,
+    ageRestriction: payload.ageRestriction,
+    imageUrl: payload.imageUrl,
+    tagIds: payload.tagIds ?? [],
+    categoryIds: payload.categoryIds ?? [],
+  };
+  
+  console.log("createEvent payload:", JSON.stringify(body)); // ← добавь это
+  
   const data = await apiClient("/events", {
     method: "POST",
-    body: JSON.stringify({
-      title:           payload.title,
-      description:     payload.description,
-      latitude:        payload.latitude,
-      longitude:       payload.longitude,
-      country:         payload.country,
-      city:            payload.city,
-      startTime:       payload.startTime,   // camelCase — backend requires this
-      endTime:         payload.endTime,
-      maxParticipants: payload.maxParticipants,
-      ageRestriction:  payload.ageRestriction,
-      imageUrl:        payload.imageUrl,
-      status:          payload.status ?? "upcoming",
-      userId:          payload.userId ?? 1,
-    }),
+    body: JSON.stringify(body),
   });
-  return data.data;
+  const id = typeof data.data === "object" ? data.data?.id : data.data;
+  return { id };
 };
 
 const normaliseEvent = (event) => {
@@ -58,6 +64,7 @@ const normaliseEvent = (event) => {
   const end   = new Date(event.endTime);
   let status  = "upcoming";
   if (now >= start && now <= end) status = "current";
+  
 
   return {
     id:          event.id,
@@ -68,7 +75,11 @@ const normaliseEvent = (event) => {
     time:        formatTime(event.startTime),
     startTime:   event.startTime,
     endTime:     event.endTime,
-    location:    event.city ?? event.country ?? "",
+    location:
+      event.address ??
+      event.city ??
+      event.country ??
+      "",
     city:        event.city ?? "",
     country:     event.country ?? "",
     status,
@@ -93,5 +104,5 @@ export const createTag = async (name) => {
     method: "POST",
     body: JSON.stringify({ name }),
   });
-  return data.data; // { id, status } or { status }
+  return data.data;
 };
