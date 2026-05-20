@@ -52,7 +52,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
 
       setIsLoggedIn(true);
 
-      navigate("/map");
+      navigate("/my-events");
     } catch (error) {
       console.error("Login error:", error);
       setErrorMessage("Incorrect email or password.");
