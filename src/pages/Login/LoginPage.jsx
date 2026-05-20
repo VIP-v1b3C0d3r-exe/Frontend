@@ -21,15 +21,29 @@ const LoginPage = ({ setIsLoggedIn }) => {
         password,
       });
 
-      console.log(data);
+      console.log("Login response:", data);
 
-      setToken(data.data.access_token);
+      const token =
+        data?.data?.access_token ||
+        data?.data?.accessToken ||
+        data?.data?.token ||
+        data?.access_token ||
+        data?.accessToken ||
+        data?.token;
+
+      if (!token) {
+        console.error("Token not found:", data);
+        return;
+      }
+
+      setToken(token);
+      localStorage.setItem("token", token);
 
       setIsLoggedIn(true);
 
-      navigate("/map");
+      navigate("/my-events");
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
     }
   };
 
@@ -71,8 +85,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
         </form>
 
         <p className={styles.bottomText}>
-          Don&apos;t have an account?{" "}
-          <Link to="/register">Register</Link>
+          Don&apos;t have an account? <Link to="/register">Register</Link>
         </p>
       </section>
     </main>

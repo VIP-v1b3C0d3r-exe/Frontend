@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 export async function apiClient(endpoint, options = {}) {
   const token = localStorage.getItem("token");
@@ -7,7 +7,7 @@ export async function apiClient(endpoint, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });
