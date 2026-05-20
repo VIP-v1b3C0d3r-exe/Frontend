@@ -2,7 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 
 import { loginUser } from "../../api/authApi";
-import { setToken } from "../../utils/token";
+import { setRefreshToken, setToken } from "../../utils/token";
 
 import styles from "./LoginPage.module.css";
 
@@ -11,39 +11,51 @@ const LoginPage = ({ setIsLoggedIn }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    setErrorMessage("");
 
     try {
-      const data = await loginUser({
+      const response = await loginUser({
         email,
         password,
       });
 
-      console.log("Login response:", data);
+      console.log("Login response:", response);
 
-      const token =
-        data?.data?.access_token ||
-        data?.data?.accessToken ||
-        data?.data?.token ||
-        data?.access_token ||
-        data?.accessToken ||
-        data?.token;
+      const accessToken =
+        response?.data?.access_token ||
+        response?.data?.accessToken ||
+        response?.data?.token ||
+        response?.access_token ||
+        response?.accessToken ||
+        response?.token;
 
-      if (!token) {
-        console.error("Token not found:", data);
+      const refreshToken =
+        response?.data?.refresh_token ||
+        response?.data?.refreshToken ||
+        response?.refresh_token ||
+        response?.refreshToken;
+
+      if (!accessToken) {
+        setErrorMessage("Login failed. Access token was not received.");
         return;
       }
 
-      setToken(token);
-      localStorage.setItem("token", token);
+      setToken(accessToken);
+
+      if (refreshToken) {
+        setRefreshToken(refreshToken);
+      }
 
       setIsLoggedIn(true);
 
       navigate("/my-events");
     } catch (error) {
       console.error("Login error:", error);
+      setErrorMessage("Incorrect email or password.");
     }
   };
 
@@ -72,6 +84,10 @@ const LoginPage = ({ setIsLoggedIn }) => {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
+
+          {errorMessage && (
+            <p className={styles.errorMessage}>{errorMessage}</p>
+          )}
 
           <div className={styles.options}>
             <Link to="/forgot-password" className={styles.forgotPassword}>
