@@ -1,19 +1,16 @@
 import { apiClient } from "./apiClient";
 
-/**
- * Fetch a list of events with optional filters.
- */
 export const fetchEvents = async (params = {}) => {
   const query = new URLSearchParams();
 
   if (params.city) query.set("city", params.city);
   if (params.country) query.set("country", params.country);
   if (params.category_id) query.set("category_id", params.category_id);
-  if (params.tag_id) query.set("tag_id", params.tag_id);
-  if (params.date_from) query.set("date_from", params.date_from);
-  if (params.date_to) query.set("date_to", params.date_to);
-
-  query.set("limit", params.limit ?? 50);
+  if (params.tag_id)      query.set("tag_id",      params.tag_id);
+  if (params.date_from)   query.set("date_from", `${params.date_from}T00:00:00`);
+  if (params.date_to)     query.set("date_to",   `${params.date_to}T23:59:59`);
+  
+  query.set("limit",  params.limit  ?? 50);
   query.set("offset", params.offset ?? 0);
 
   const data = await apiClient(`/events?${query.toString()}`);
@@ -36,49 +33,74 @@ export const fetchEvent = async (id) => {
   return normaliseEvent(data.data);
 };
 
-/**
- * Fetch all categories.
- * Returns: [{ id, name }, ...]
- */
 export const fetchCategories = async () => {
   const data = await apiClient("/categories");
   return data.data ?? [];
 };
 
-/**
- * Normalise API event shape → UI shape.
- */
-const normaliseEvent = (event) => ({
-  id: event.id,
-  title: event.title,
-  description: event.description ?? "",
+export const fetchTags = async () => {
+  const data = await apiClient("/tags");
+  return data.data ?? [];
+};
 
-  lat: event.latitude,
-  lng: event.longitude,
+export const createEvent = async (payload) => {
+  const body = {
+    title: payload.title,
+    description: payload.description,
+    latitude: payload.latitude,
+    longitude: payload.longitude,
+    country: payload.country,
+    city: payload.city,
+    startTime: payload.startTime,
+    endTime: payload.endTime,
+    maxParticipants: payload.maxParticipants,
+    ageRestriction: payload.ageRestriction,
+    imageUrl: payload.imageUrl,
+    tagIds: payload.tagIds ?? [],
+    categoryIds: payload.categoryIds ?? [],
+  };
+  
+  const data = await apiClient("/events", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+  const id = typeof data.data === "object" ? data.data?.id : data.data;
+  return { id };
+};
 
-  time: formatTime(event.startTime ?? event.start_time),
-  startTime: event.startTime ?? event.start_time,
-  endTime: event.endTime ?? event.end_time,
+const normaliseEvent = (event) => {
+  const now   = new Date();
+  const start = new Date(event.startTime);
+  const end   = new Date(event.endTime);
+  const isToday = start.toDateString() === now.toDateString();
+  
+  let status = "upcoming";
+  if (now >= start && now <= end) status = "current";        // идёт прямо сейчас
+  else if (isToday && start > now) status = "current";       // сегодня но ещё не началось
+  
+  return {
+    id:          event.id,
+    title:       event.title,
+    description: event.description ?? "",
+    lat:         event.latitude,
+    lng:         event.longitude,
+    time:        formatTime(event.startTime),
+    startTime:   event.startTime,
+    endTime:     event.endTime,
+    location:
+      event.address ??
+      event.city ??
+      event.country ??
+      "",
+    city:        event.city ?? "",
+    country:     event.country ?? "",
+    status,
+    image_url:   event.imageUrl ?? null,
+    tagIds:      event.tagIds ?? [],
+    categoryIds: event.categoryIds ?? [],
+  };
+};
 
-  location: event.city ?? event.country ?? event.address ?? "",
-
-  status: event.status ?? "upcoming",
-  image_url: event.imageUrl ?? event.image_url ?? null,
-
-  category: event.category ?? event.categoryName ?? "Other",
-  subcategory: event.subcategory ?? null,
-  tags: event.tags ?? [],
-
-  createdBy: event.createdBy ?? event.created_by ?? null,
-  createdAt: event.createdAt ?? event.created_at ?? null,
-
-  minAge: event.minAge ?? event.min_age ?? event.ageRequirement ?? null,
-  capacity: event.capacity ?? null,
-  joinedCount: event.joinedCount ?? event.joined_count ?? null,
-  isJoined: event.isJoined ?? event.is_joined ?? true,
-});
-
-/** "2026-06-01T20:00:00Z" → "8:00 PM" */
 const formatTime = (isoString) => {
   if (!isoString) return "";
 
@@ -89,4 +111,12 @@ const formatTime = (isoString) => {
     minute: "2-digit",
     hour12: true,
   });
+};
+
+export const createTag = async (name) => {
+  const data = await apiClient("/tags", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+  return data.data;
 };

@@ -1,15 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./FilterPanel.module.css";
-import { fetchCategories } from "../../api/eventsApi";
-
-// Static sub-category tree (client-side only — API has no sub-categories yet)
-const CATEGORY_TREE = {
-  Music:     ["Jazz", "Rock", "Classical", "Electronic", "Folk"],
-  Workshops: ["Coding", "Art", "Cooking", "Photography", "Design"],
-  Meetups:   ["Networking", "Social", "Professional", "Community"],
-  Active:    ["Running", "Cycling", "Yoga", "Hiking", "Swimming"],
-  Food:      ["Street Food", "Fine Dining", "Vegan", "BBQ", "Market"],
-};
+import { fetchCategories, fetchTags } from "../../api/eventsApi";
+import TagSearch from "../TagSearch/TagSearch";
 
 const EVENT_IMAGES = {
   Music:     "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120&q=80",
@@ -19,7 +11,6 @@ const EVENT_IMAGES = {
   Food:      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=120&q=80",
 };
 
-// FilterDropdown
 const FilterDropdown = ({ label, children, activeCount }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -51,68 +42,6 @@ const FilterDropdown = ({ label, children, activeCount }) => {
   );
 };
 
-// CategoryDropdown
-const CategoryDropdown = ({ category, subcategories, selectedSubs, onToggleSub, isActive, onToggleCategory }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className={styles.categoryDropdownGroup}>
-      <div className={styles.categoryHeaderRow}>
-        <label className={styles.checkboxLabel}>
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={() => onToggleCategory(category)}
-            className={styles.checkbox}
-          />
-          <span className={styles.checkboxText}>{category}</span>
-        </label>
-        <button className={styles.expandBtn} onClick={() => setIsOpen(!isOpen)} type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" strokeWidth="2"
-               style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "0.2s" }}>
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </button>
-      </div>
-
-      {isOpen && (
-        <div className={styles.treeChildren}>
-          {subcategories.map((sub) => {
-            const key = `${category}::${sub}`;
-            return (
-              <label key={sub} className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={selectedSubs.includes(key)}
-                  onChange={() => onToggleSub(key)}
-                  className={styles.checkbox}
-                />
-                <span className={styles.checkboxTextSub}>{sub}</span>
-              </label>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Main FilterPanel
-
-/**
- * Props
- * ─────
- * events          – normalised event array from MapPage (already fetched)
- * activeCategory  – category name selected via chip in MapPage (string | null)
- * search          – search text controlled by MapPage
- * onSearchChange  – (val: string) => void
- * onClose         – () => void
- * isOpen          – boolean
- * onFilterChange  – (apiParams: Object) => void   ← NEW: tells MapPage to re-fetch
- * loading         – boolean                        ← NEW: shows loading state
- */
-
 const FilterPanel = ({
   events,
   activeCategory,
@@ -123,20 +52,19 @@ const FilterPanel = ({
   onFilterChange,
   loading = false,
 }) => {
-  // Local filter state
-  const [selectedCategories, setSelectedCategories] = useState(
-    activeCategory ? [activeCategory] : []
-  );
-  const [selectedSubs,   setSelectedSubs]   = useState([]);
   const [locationFilter, setLocationFilter] = useState("");
   const [dateFilter,     setDateFilter]     = useState("");
   const [timeOfDay,      setTimeOfDay]      = useState(null);
+  const [selectedTags,   setSelectedTags]   = useState([]); // [{ id, name }]
+  const [tags,           setTags]           = useState([]);
+  const [categoryMap,    setCategoryMap]    = useState({}); // { "Music": 1, ... }
 
-  // Category data from API
-  // Maps display name → API UUID so we can pass category_id to the API
-  const [categoryMap, setCategoryMap] = useState({}); // { "Music": "uuid-...", ... }
-
+  // Load tags and categories from API
   useEffect(() => {
+    fetchTags()
+      .then(setTags)
+      .catch((err) => console.error("Failed to load tags:", err));
+
     fetchCategories()
       .then((cats) => {
         const map = {};
@@ -146,102 +74,72 @@ const FilterPanel = ({
       .catch((err) => console.error("Failed to load categories:", err));
   }, []);
 
-  // Sync with parent chip selection
+  // When activeCategory or categoryMap changes → emit category_id to MapPage
+  const mounted = useRef(false);
+
   useEffect(() => {
-    if (activeCategory && !selectedCategories.includes(activeCategory)) {
-      setSelectedCategories([activeCategory]);
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
     }
-  }, [activeCategory]);
-
-  // Build API params & notify parent whenever filter state changes
-  const buildAndEmit = useCallback((overrides = {}) => {
-    if (!onFilterChange) return;
-
-    const state = {
-      selectedCategories,
-      locationFilter,
-      dateFilter,
-      ...overrides,
-    };
-
+    if (!onFilterChange || Object.keys(categoryMap).length === 0) return;
     const params = {};
-
-    // category_id — only send when exactly one category is selected
-    // (API currently takes a single category_id)
-    if (state.selectedCategories.length === 1) {
-      const uuid = categoryMap[state.selectedCategories[0]];
-      if (uuid) params.category_id = uuid;
+    if (locationFilter) params.city = locationFilter;
+    if (dateFilter) {
+      params.date_from = dateFilter;
+      params.date_to   = dateFilter;
     }
-
-    if (state.locationFilter) params.city = state.locationFilter;
-    if (state.dateFilter) {
-      params.date_from = state.dateFilter;
-      params.date_to   = state.dateFilter;
-    }
-
     onFilterChange(params);
-  }, [selectedCategories, locationFilter, dateFilter, categoryMap, onFilterChange]);
+  }, [activeCategory, categoryMap, locationFilter, dateFilter]);
 
-  // Toggle helpers — update state then emit
-  const toggleCategory = (cat) => {
-    const next = selectedCategories.includes(cat)
-      ? selectedCategories.filter((c) => c !== cat)
-      : [...selectedCategories, cat];
-    setSelectedCategories(next);
-    buildAndEmit({ selectedCategories: next });
-  };
+  const handleLocationChange = (val) => setLocationFilter(val);
+  const handleDateChange     = (val) => setDateFilter(val);
 
-  const toggleSub = (key) => {
-    setSelectedSubs((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
-    // Sub-categories are client-side only for now (API has no sub-category filter)
-  };
+  const handleTagsChange = (newTags) => {
+    setSelectedTags(newTags);
+  }
 
-  const handleLocationChange = (val) => {
-    setLocationFilter(val);
-    buildAndEmit({ locationFilter: val });
-  };
-
-  const handleDateChange = (val) => {
-    setDateFilter(val);
-    buildAndEmit({ dateFilter: val });
-  };
-
-  // Client-side filtering (on top of the API results)
   const filtered = events.filter((event) => {
     const matchesSearch =
+      !search ||
       event.title.toLowerCase().includes(search.toLowerCase()) ||
-      event.location.toLowerCase().includes(search.toLowerCase());
+      (event.location ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (event.address ?? "").toLowerCase().includes(search.toLowerCase());
 
-    let matchesCategory = true;
-    if (selectedCategories.length > 0) {
-      const isParentSelected = selectedCategories.includes(event.category);
-      const activeSubsForCat = selectedSubs
-        .filter((s) => s.startsWith(`${event.category}::`))
-        .map((s) => s.split("::")[1]);
+    const matchesCategory = !activeCategory ||
+      (event.categoryIds && event.categoryIds.includes(categoryMap[activeCategory]));
 
-      if (!isParentSelected) {
-        matchesCategory = false;
-      } else if (activeSubsForCat.length > 0) {
-        matchesCategory = activeSubsForCat.includes(event.subcategory);
-      }
-    }
+      const matchesTags = (() => {
+        if (selectedTags.length === 0) return true;
+        return selectedTags.some((selectedName) => {
+          const tag = tags.find((t) => t.name === selectedName);
+          return tag && (event.tagIds ?? []).includes(tag.id);
+        });
+      })();
 
-    const matchesTime = timeOfDay
-      ? timeOfDay === "AM"
-        ? parseInt(event.time) < 12
-        : parseInt(event.time) >= 12
-      : true;
+    const matchesTime = timeOfDay ? (() => {
+      const hour = new Date(event.startTime).getHours();
+      return timeOfDay === "AM" ? hour < 12 : hour >= 12;
+    })() : true;
 
-    return matchesSearch && matchesCategory && matchesTime;
-  });
+    const matchesLocation =
+      !locationFilter ||
+      (event.address ?? "").toLowerCase().includes(locationFilter.toLowerCase()) ||
+      (event.city ?? "").toLowerCase().includes(locationFilter.toLowerCase()) ||
+      (event.country ?? "").toLowerCase().includes(locationFilter.toLowerCase());
 
-  // Render
+    return matchesSearch && matchesCategory && matchesTags && matchesTime && matchesLocation;
+});
+    const getCategoryImage = (event) => {
+      if (event.image_url) return event.image_url;
+      const categoryName = Object.keys(categoryMap).find(
+        name => event.categoryIds?.includes(categoryMap[name])
+      );
+      return EVENT_IMAGES[categoryName] ?? EVENT_IMAGES.Music;
+    };
+
   return (
     <div className={`${styles.panel} ${isOpen ? styles.panelOpen : styles.panelClosed}`}>
-
-      {/* Search Header */}
       <div className={styles.searchRow}>
         <div className={styles.searchBox}>
           <input
@@ -265,17 +163,21 @@ const FilterPanel = ({
         </button>
       </div>
 
-      {/* Dropdown Filters Row */}
       <div className={styles.filterBtnsRow}>
         <FilterDropdown label="Time" activeCount={(dateFilter ? 1 : 0) + (timeOfDay ? 1 : 0)}>
           <div className={styles.dropdownContent}>
             <label className={styles.dropdownLabel}>Date</label>
-            <input
-              type="date"
-              className={styles.dropdownInput}
-              value={dateFilter}
-              onChange={(e) => handleDateChange(e.target.value)}
-            />
+            <div className={styles.dateInputRow}>
+              <input
+                type="date"
+                className={styles.dropdownInput}
+                value={dateFilter}
+                onChange={(e) => handleDateChange(e.target.value)}
+              />
+              {dateFilter && (
+                <button className={styles.clearDate} onClick={() => handleDateChange("")}>✕</button>
+              )}
+            </div>
             <div className={styles.ampmRow}>
               <button
                 className={`${styles.ampmBtn} ${timeOfDay === "AM" ? styles.ampmActive : ""}`}
@@ -296,36 +198,23 @@ const FilterPanel = ({
               className={styles.dropdownInput}
               value={locationFilter}
               onChange={(e) => handleLocationChange(e.target.value)}
-              placeholder="e.g. Old Town"
+              placeholder="e.g. Vilnius"
             />
           </div>
         </FilterDropdown>
       </div>
 
-      {/* Header */}
       <div className={styles.categoryHeader}>
         <h2 className={styles.panelTitle}>{activeCategory || "All Events"}</h2>
-        <span className={styles.count}>
-          {loading ? "…" : filtered.length}
-        </span>
+        <span className={styles.count}>{loading ? "…" : filtered.length}</span>
       </div>
 
-      {/* Category tree */}
-      <div className={styles.treeBox}>
-        {Object.entries(CATEGORY_TREE).map(([cat, subs]) => (
-          <CategoryDropdown
-            key={cat}
-            category={cat}
-            subcategories={subs}
-            selectedSubs={selectedSubs}
-            onToggleSub={toggleSub}
-            isActive={selectedCategories.includes(cat)}
-            onToggleCategory={toggleCategory}
-          />
-        ))}
-      </div>
+      <TagSearch
+        tags={tags}
+        selectedTags={selectedTags}
+        onTagsChange={handleTagsChange}
+      />
 
-      {/* Results list */}
       <div className={styles.list}>
         {loading ? (
           <p className={styles.empty}>Loading events…</p>
@@ -335,17 +224,19 @@ const FilterPanel = ({
           filtered.map((event) => (
             <div key={event.id} className={styles.card}>
               <img
-                src={event.image_url ?? EVENT_IMAGES[event.category] ?? EVENT_IMAGES.Music}
+                src={getCategoryImage(event)}
                 alt={event.title}
                 className={styles.cardImage}
+                onError={(e) => { e.target.src = EVENT_IMAGES.Music; }}
               />
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{event.title}</h3>
-                <p className={styles.cardMeta}>{event.time} · {event.location}</p>
-                <div className={styles.tags}>
-                  <span className={styles.tag}>{event.category}</span>
-                  {event.subcategory && <span className={styles.tag}>{event.subcategory}</span>}
-                </div>
+                <p className={styles.cardMeta}>
+                  {new Date(event.startTime).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · {event.time} · {event.city || event.location}
+                </p>
+                {event.ageRestriction > 0 && (
+                  <span className={styles.tag}>{event.ageRestriction}+</span>
+                )}
               </div>
             </div>
           ))
