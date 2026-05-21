@@ -98,7 +98,21 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
         tagIds,  // ← сразу в теле
       };
   
-      const newEvent = await createEvent(payload);
+      const newEvent = await createEvent(payload); // без tagIds
+
+      if (form.category_id && newEvent?.id) {
+        await fetch(
+          `${import.meta.env.VITE_API_URL}/events/${newEvent.id}/categories/${form.category_id}`,
+          { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        ).catch(e => console.warn("Category failed:", e));
+      }
+
+      for (const tagId of tagIds) {
+        await fetch(
+          `${import.meta.env.VITE_API_URL}/events/${newEvent.id}/tags/${tagId}`,
+          { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        ).catch(e => console.warn("Tag failed:", e));
+      }
   
       // RESET
       setForm({

@@ -99,49 +99,44 @@ const FilterPanel = ({
     setSelectedTags(newTags);
   }
 
-  // Client-side filtering on top of API results
   const filtered = events.filter((event) => {
     const matchesSearch =
       !search ||
       event.title.toLowerCase().includes(search.toLowerCase()) ||
-      (event.location ?? "")
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      (event.address ?? "")
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      (event.location ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (event.address ?? "").toLowerCase().includes(search.toLowerCase());
 
     const matchesCategory = !activeCategory ||
-        (event.categoryIds && event.categoryIds.includes(categoryMap[activeCategory]));
+      (event.categoryIds && event.categoryIds.includes(categoryMap[activeCategory]));
 
-    const matchesTags =
-      selectedTags.length === 0 ||
-      selectedTags.some((selectedName) => {
-        const tag = tags.find((t) => t.name === selectedName);
-        console.log("tag:", selectedName, "→ id:", tag?.id, "| event", event.id, "tagIds:", event.tagIds);
-        return tag && (event.tagIds ?? []).includes(tag.id);
-      });
-  
+      const matchesTags = (() => {
+        if (selectedTags.length === 0) return true;
+        return selectedTags.some((selectedName) => {
+          const tag = tags.find((t) => t.name === selectedName);
+          return tag && (event.tagIds ?? []).includes(tag.id);
+        });
+      })();
+
     const matchesTime = timeOfDay ? (() => {
       const hour = new Date(event.startTime).getHours();
       return timeOfDay === "AM" ? hour < 12 : hour >= 12;
     })() : true;
-  
-    // Location filter — matches city OR country (client-side)
+
     const matchesLocation =
       !locationFilter ||
-      (event.address ?? "")
-        .toLowerCase()
-        .includes(locationFilter.toLowerCase()) ||
-      (event.city ?? "")
-        .toLowerCase()
-        .includes(locationFilter.toLowerCase()) ||
-      (event.country ?? "")
-        .toLowerCase()
-        .includes(locationFilter.toLowerCase());
-  
+      (event.address ?? "").toLowerCase().includes(locationFilter.toLowerCase()) ||
+      (event.city ?? "").toLowerCase().includes(locationFilter.toLowerCase()) ||
+      (event.country ?? "").toLowerCase().includes(locationFilter.toLowerCase());
+
     return matchesSearch && matchesCategory && matchesTags && matchesTime && matchesLocation;
-  });
+});
+    const getCategoryImage = (event) => {
+      if (event.image_url) return event.image_url;
+      const categoryName = Object.keys(categoryMap).find(
+        name => event.categoryIds?.includes(categoryMap[name])
+      );
+      return EVENT_IMAGES[categoryName] ?? EVENT_IMAGES.Music;
+    };
 
   return (
     <div className={`${styles.panel} ${isOpen ? styles.panelOpen : styles.panelClosed}`}>
@@ -203,7 +198,7 @@ const FilterPanel = ({
               className={styles.dropdownInput}
               value={locationFilter}
               onChange={(e) => handleLocationChange(e.target.value)}
-              placeholder="e.g. Old Town"
+              placeholder="e.g. Vilnius"
             />
           </div>
         </FilterDropdown>
@@ -229,16 +224,19 @@ const FilterPanel = ({
           filtered.map((event) => (
             <div key={event.id} className={styles.card}>
               <img
-                src={event.image_url ?? EVENT_IMAGES[event.category] ?? EVENT_IMAGES.Music}
+                src={getCategoryImage(event)}
                 alt={event.title}
                 className={styles.cardImage}
+                onError={(e) => { e.target.src = EVENT_IMAGES.Music; }}
               />
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{event.title}</h3>
-                <p className={styles.cardMeta}>{event.time} · {event.location}</p>
-                <div className={styles.tags}>
-                  {event.category && <span className={styles.tag}>{event.category}</span>}
-                </div>
+                <p className={styles.cardMeta}>
+                  {new Date(event.startTime).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · {event.time} · {event.city || event.location}
+                </p>
+                {event.ageRestriction > 0 && (
+                  <span className={styles.tag}>{event.ageRestriction}+</span>
+                )}
               </div>
             </div>
           ))

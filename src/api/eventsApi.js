@@ -48,8 +48,6 @@ export const createEvent = async (payload) => {
     categoryIds: payload.categoryIds ?? [],
   };
   
-  console.log("createEvent payload:", JSON.stringify(body)); // ← добавь это
-  
   const data = await apiClient("/events", {
     method: "POST",
     body: JSON.stringify(body),
@@ -62,10 +60,12 @@ const normaliseEvent = (event) => {
   const now   = new Date();
   const start = new Date(event.startTime);
   const end   = new Date(event.endTime);
-  let status  = "upcoming";
-  if (now >= start && now <= end) status = "current";
+  const isToday = start.toDateString() === now.toDateString();
   
-
+  let status = "upcoming";
+  if (now >= start && now <= end) status = "current";        // идёт прямо сейчас
+  else if (isToday && start > now) status = "current";       // сегодня но ещё не началось
+  
   return {
     id:          event.id,
     title:       event.title,
