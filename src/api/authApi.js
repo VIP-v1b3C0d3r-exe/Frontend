@@ -10,7 +10,13 @@ export const loginUser = async ({ email, password }) => {
   });
 };
 
-export const registerUser = async ({ username, email, password, age }) => {
+
+export const registerUser = async ({
+  username,
+  email,
+  password,
+  age,
+}) => {
   return apiClient("/auth/register", {
     method: "POST",
     body: JSON.stringify({
@@ -18,6 +24,15 @@ export const registerUser = async ({ username, email, password, age }) => {
       email,
       password,
       age,
+    }),
+  });
+};
+
+export const refreshToken = async (refreshTokenValue) => {
+  return apiClient("/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({
+      refreshToken: refreshTokenValue,
     }),
   });
 };

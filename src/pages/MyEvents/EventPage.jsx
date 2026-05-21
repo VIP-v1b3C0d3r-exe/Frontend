@@ -4,15 +4,9 @@ import { apiClient } from "../../api/apiClient";
 import { fetchEvents } from "../../api/eventsApi";
 
 const STATUS_COLORS = {
-  current:          "#c8ceb8",
-  upcoming:         "#b0bcbb",
+  current: "#c8ceb8",
+  upcoming: "#b0bcbb",
   "created by you": "#cac0d4",
-};
-
-const STATUS_LABEL = {
-  current:          "current",
-  upcoming:         "upcoming",
-  "created by you": "created by you",
 };
 
 const PAGE_SIZE = 8;
