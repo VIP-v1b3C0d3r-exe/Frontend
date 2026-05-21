@@ -15,7 +15,7 @@ export const fetchEvents = async (params = {}) => {
 
   const data = await apiClient(`/events?${query.toString()}`);
   return (data.data ?? []).map(normaliseEvent);
-};
+}; 
 
 /**
  * Fetch events joined by current user.
@@ -59,7 +59,7 @@ export const createEvent = async (payload) => {
     tagIds: payload.tagIds ?? [],
     categoryIds: payload.categoryIds ?? [],
   };
-  
+
   const data = await apiClient("/events", {
     method: "POST",
     body: JSON.stringify(body),
