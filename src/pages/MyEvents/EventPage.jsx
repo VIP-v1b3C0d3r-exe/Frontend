@@ -9,6 +9,12 @@ const STATUS_COLORS = {
   "created by you": "#cac0d4",
 };
 
+const STATUS_LABEL = {
+  current:          "current",
+  upcoming:         "upcoming",
+  "created by you": "created by you",
+};
+ 
 const PAGE_SIZE = 8;
 
 const normaliseStatus = (event, createdByMe) => {
