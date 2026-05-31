@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - feature/**
 
 jobs:
   deploy:
@@ -27,9 +28,12 @@ jobs:
             echo "Installing packages..."
             npm install
 
-            echo "Running application..."
-            nohup npm run dev -- --host 0.0.0.0 > app.log 2>&1 &
-            disown
+            echo "Restarting application..."
+            pm2 describe frontend > /dev/null 2>&1 \
+              && pm2 restart frontend \
+              || pm2 start npm --name "frontend" -- run dev -- --host 0.0.0.0
+
+            pm2 save
 
             echo "Deployment completed!"
   
