@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./EventPage.module.css";
 import { apiClient } from "../../api/apiClient";
 import { fetchEvents } from "../../api/eventsApi";
+import { useNavigate } from "react-router-dom";
 
 const STATUS_COLORS = {
   current: "#c8ceb8",
@@ -32,6 +33,8 @@ const EventPage = () => {
   const [events,  setEvents]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [page,    setPage]    = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
@@ -110,7 +113,7 @@ const EventPage = () => {
                 <p><span className={styles.label}>City:</span> {event.address}</p>
               </div>
                 </div>
-                <button className={styles.viewBtn}>View</button>
+                <button className={styles.viewBtn} onClick={() => navigate(`/events/${event.id}`)}>View</button>
               </div>
             );
           })}
