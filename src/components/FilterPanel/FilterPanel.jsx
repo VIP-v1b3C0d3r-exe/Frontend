@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./FilterPanel.module.css";
 import { fetchCategories, fetchTags } from "../../api/eventsApi";
 import TagSearch from "../TagSearch/TagSearch";
+import { useNavigate }  from "react-router-dom";
 
 const EVENT_IMAGES = {
   Music:     "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120&q=80",
@@ -58,6 +59,8 @@ const FilterPanel = ({
   const [selectedTags,   setSelectedTags]   = useState([]); // [{ id, name }]
   const [tags,           setTags]           = useState([]);
   const [categoryMap,    setCategoryMap]    = useState({}); // { "Music": 1, ... }
+
+  const navigate = useNavigate();
 
   // Load tags and categories from API
   useEffect(() => {
@@ -222,7 +225,7 @@ const FilterPanel = ({
           <p className={styles.empty}>No events found</p>
         ) : (
           filtered.map((event) => (
-            <div key={event.id} className={styles.card}>
+            <div key={event.id} className={styles.card} onClick={() => navigate(`/events/${event.id}`)} style={{ cursor: "pointer" }}>
               <img
                 src={getCategoryImage(event)}
                 alt={event.title}
