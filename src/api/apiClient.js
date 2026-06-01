@@ -2,6 +2,20 @@ import { refreshToken } from "./authApi";
 
 const API_URL = import.meta.env.VITE_API_URL || "/api";
 
+const PUBLIC_ENDPOINTS = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/refresh",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+];
+
+const isPublicEndpoint = (endpoint) => {
+  return PUBLIC_ENDPOINTS.some((publicEndpoint) =>
+    endpoint.startsWith(publicEndpoint)
+  );
+};
+
 export async function apiClient(endpoint, options = {}) {
   let token = localStorage.getItem("token");
 
@@ -9,12 +23,17 @@ export async function apiClient(endpoint, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(!isPublicEndpoint(endpoint) && token
+        ? { Authorization: `Bearer ${token}` }
+        : {}),
       ...options.headers,
     },
   });
 
-  if (response.status === 401 || response.status === 403) {
+  if (
+    !isPublicEndpoint(endpoint) &&
+    (response.status === 401 || response.status === 403)
+  ) {
     try {
       const storedRefreshToken = localStorage.getItem("refreshToken");
 
@@ -24,11 +43,8 @@ export async function apiClient(endpoint, options = {}) {
 
       const refreshResponse = await refreshToken(storedRefreshToken);
 
-      const newAccessToken =
-        refreshResponse?.data?.access_token;
-
-      const newRefreshToken =
-        refreshResponse?.data?.refresh_token;
+      const newAccessToken = refreshResponse?.data?.access_token;
+      const newRefreshToken = refreshResponse?.data?.refresh_token;
 
       if (!newAccessToken || !newRefreshToken) {
         throw new Error("Failed to refresh token");
@@ -39,14 +55,11 @@ export async function apiClient(endpoint, options = {}) {
 
       token = newAccessToken;
 
-    
       response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers: {
           "Content-Type": "application/json",
-          ...(token
-            ? { Authorization: `Bearer ${token}` }
-            : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...options.headers,
         },
       });
@@ -65,9 +78,7 @@ export async function apiClient(endpoint, options = {}) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
 
-    throw new Error(
-      error?.error?.message ?? `HTTP ${response.status}`
-    );
+    throw new Error(error?.error?.message ?? `HTTP ${response.status}`);
   }
 
   return response.json();
