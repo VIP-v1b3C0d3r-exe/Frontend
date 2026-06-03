@@ -50,7 +50,7 @@ export async function apiClient(endpoint, options = {}) {
       token = newAccessToken;
 
     
-      response = await fetch(`${API_URL}${endpoint}`, {
+      response = await fetch(url, {
         ...options,
         headers: {
           "Content-Type": "application/json",
