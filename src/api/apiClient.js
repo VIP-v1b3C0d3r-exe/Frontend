@@ -1,6 +1,6 @@
 import { refreshToken } from "./authApi";
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+const API_URL = "/api";
 
 export async function apiClient(endpoint, options = {}) {
   let token = localStorage.getItem("token");
