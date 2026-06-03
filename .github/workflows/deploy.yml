@@ -28,9 +28,8 @@ jobs:
             npm install
 
             echo "Restarting application..."
-            pm2 describe frontend > /dev/null 2>&1 \
-              && pm2 restart frontend \
-              || pm2 start npm --name "frontend" -- run dev -- --host 0.0.0.0
+            pm2 delete frontend
+            pm2 start npm --name "frontend" -- run dev -- --host 0.0.0.0
 
             pm2 save
 
