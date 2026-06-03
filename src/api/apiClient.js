@@ -1,6 +1,6 @@
 import { refreshToken } from "./authApi";
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+const API_URL = "/api";
 
 const PUBLIC_ENDPOINTS = [
   "/auth/login",
@@ -19,7 +19,17 @@ const isPublicEndpoint = (endpoint) => {
 export async function apiClient(endpoint, options = {}) {
   let token = localStorage.getItem("token");
 
-  let response = await fetch(`${API_URL}${endpoint}`, {
+  const url = `${API_URL}${endpoint}`;
+
+  console.log("[API REQUEST]", {
+    url,
+    endpoint,
+    method: options.method || "GET",
+    token: token ? "exists" : "missing",
+    body: options.body,
+  });
+
+  let response = await fetch(url, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -55,7 +65,8 @@ export async function apiClient(endpoint, options = {}) {
 
       token = newAccessToken;
 
-      response = await fetch(`${API_URL}${endpoint}`, {
+    
+      response = await fetch(url, {
         ...options,
         headers: {
           "Content-Type": "application/json",

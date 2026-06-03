@@ -5,7 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    port: 5173,
+    port: 80,
+    allowedHosts: [
+      "ec2-51-20-182-189.eu-north-1.compute.amazonaws.com",
+    ],
     proxy: {
       "/api": {
         target: "http://51.21.218.154:8080",
@@ -13,12 +16,5 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
-  },
-  preview: {
-    host: true,
-    port: 80,
-    allowedHosts: [
-      "ec2-51-20-182-189.eu-north-1.compute.amazonaws.com",
-    ],
   },
 });
