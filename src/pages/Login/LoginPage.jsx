@@ -16,7 +16,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
   const handleLogin = async (event) => {
     event.preventDefault();
     setErrorMessage("");
-
+    console.log("handle login!!!");
     try {
       const response = await loginUser({
         email,
