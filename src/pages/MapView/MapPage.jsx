@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./MapPage.module.css";
 import FilterPanel from "../../components/FilterPanel/FilterPanel";
-import EventForm from "../../components/EventForm/EventForm"
+import EventForm from "../../components/EventForm/EventForm";
 import { fetchEvents } from "../../api/eventsApi";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -28,10 +29,9 @@ const createStarIcon = (color) =>
     popupAnchor: [0, -16],
   });
 
-const blueIcon  = createStarIcon("#3b7edb");
+const blueIcon = createStarIcon("#3b7edb");
 const greenIcon = createStarIcon("#2e8f2e");
 
-// Picking marker icon
 const pickIcon = L.divIcon({
   className: "",
   html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#584D92">
@@ -43,14 +43,20 @@ const pickIcon = L.divIcon({
 
 const LocateMe = () => {
   const map = useMap();
+
   const handleLocate = () => {
     map.locate({ setView: true, maxZoom: 15 });
+
     map.once("locationfound", (e) => {
       L.circleMarker(e.latlng, {
-        radius: 8, fillColor: "#3b7edb",
-        color: "white", weight: 2, fillOpacity: 1,
+        radius: 8,
+        fillColor: "#3b7edb",
+        color: "white",
+        weight: 2,
+        fillOpacity: 1,
       }).addTo(map);
     });
+
     map.once("locationerror", () => {
       alert("Could not get your location. Please allow location access.");
     });
@@ -58,49 +64,63 @@ const LocateMe = () => {
 
   return (
     <button className={styles.locateBtn} onClick={handleLocate}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" strokeWidth="2.5">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      >
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
       </svg>
     </button>
   );
 };
 
-// Handles map clicks for location picking
 const MapClickHandler = ({ picking, onPick }) => {
   const map = useMap();
+
   useEffect(() => {
     if (!picking) return;
+
     const handler = (e) => onPick(e.latlng.lat, e.latlng.lng);
+
     map.on("click", handler);
+
     return () => map.off("click", handler);
   }, [picking, map, onPick]);
+
   return null;
 };
 
 const CATEGORIES = ["Music", "Workshops", "Meetups", "Active", "Food"];
 
 const MapPage = () => {
-  const [search,         setSearch]         = useState("");
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [panelOpen,      setPanelOpen]      = useState(false);
-  const [createOpen,     setCreateOpen]     = useState(false);
-  const [picking,        setPicking]        = useState(false);
-  const [pickedPos,      setPickedPos]      = useState(null);
+  const navigate = useNavigate();
 
-  const [events,  setEvents]  = useState([]);
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [picking, setPicking] = useState(false);
+  const [pickedPos, setPickedPos] = useState(null);
+
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState(null);
+  const [error, setError] = useState(null);
 
   const loadEvents = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
+
     try {
       const results = await fetchEvents({
-        // city: "Vilnius",
         ...filterParams,
       });
+
       setEvents(results);
     } catch (err) {
       console.error("Failed to load events:", err);
@@ -110,7 +130,9 @@ const MapPage = () => {
     }
   }, []);
 
-  useEffect(() => { loadEvents(); }, [loadEvents]);
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
 
   const handleCategoryClick = (cat) => {
     if (activeCategory === cat && panelOpen) {
@@ -137,9 +159,12 @@ const MapPage = () => {
     setSearch("");
   };
 
-  const handleFilterChange = useCallback((apiParams) => {
-    loadEvents(apiParams);
-  }, [loadEvents]);
+  const handleFilterChange = useCallback(
+    (apiParams) => {
+      loadEvents(apiParams);
+    },
+    [loadEvents]
+  );
 
   const handleFabClick = () => {
     setCreateOpen(true);
@@ -170,10 +195,12 @@ const MapPage = () => {
 
   const visibleEvents = events.filter((event) => {
     if (!search) return true;
+
     const q = search.toLowerCase();
+
     return (
-      event.title.toLowerCase().includes(q) ||
-      event.location.toLowerCase().includes(q)
+      event.title?.toLowerCase().includes(q) ||
+      event.location?.toLowerCase().includes(q)
     );
   });
 
@@ -181,8 +208,6 @@ const MapPage = () => {
 
   return (
     <div className={styles.mapPage}>
-
-      {/* Top bar */}
       <div className={`${styles.topBar} ${anyPanelOpen ? styles.topBarShifted : ""}`}>
         {!anyPanelOpen && (
           <div className={styles.searchBox}>
@@ -194,19 +219,31 @@ const MapPage = () => {
               onKeyDown={handleKeyDown}
               className={styles.searchInput}
             />
+
             <button className={styles.searchBtn} onClick={handleSearchSubmit}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
           </div>
         )}
+
         <div className={styles.filters}>
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
-              className={`${styles.filterChip} ${activeCategory === cat ? styles.filterChipActive : ""}`}
+              className={`${styles.filterChip} ${
+                activeCategory === cat ? styles.filterChipActive : ""
+              }`}
               onClick={() => handleCategoryClick(cat)}
             >
               {cat}
@@ -215,7 +252,6 @@ const MapPage = () => {
         </div>
       </div>
 
-      {/* Filter Panel */}
       <FilterPanel
         events={events}
         activeCategory={activeCategory}
@@ -231,7 +267,6 @@ const MapPage = () => {
         loading={loading}
       />
 
-      {/* Create Event Panel */}
       <EventForm
         isOpen={createOpen}
         onClose={handleCreateClose}
@@ -239,14 +274,12 @@ const MapPage = () => {
         pickedPosition={pickedPos}
       />
 
-      {/* Picking hint */}
       {picking && (
         <div className={styles.pickingHint}>
           Click anywhere on the map to set event location
         </div>
       )}
 
-      {/* Map */}
       <MapContainer
         center={[54.6872, 25.2797]}
         zoom={14}
@@ -257,11 +290,11 @@ const MapPage = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
         <ZoomControl position="bottomright" />
         <LocateMe />
         <MapClickHandler picking={picking} onPick={handleMapPick} />
 
-        {/* Picked location marker */}
         {pickedPos && (
           <Marker position={[pickedPos.lat, pickedPos.lng]} icon={pickIcon} />
         )}
@@ -274,12 +307,26 @@ const MapPage = () => {
           >
             <Popup className={styles.popup}>
               <div className={styles.popupContent}>
-                <span className={`${styles.popupStatus} ${event.status === "current" ? styles.current : styles.upcoming}`}>
+                <span
+                  className={`${styles.popupStatus} ${
+                    event.status === "current" ? styles.current : styles.upcoming
+                  }`}
+                >
                   {event.status === "current" ? "Now" : "Upcoming"}
                 </span>
+
                 <h3 className={styles.popupTitle}>{event.title}</h3>
-                <p className={styles.popupMeta}>{event.time} · {event.location}</p>
-                <button className={styles.popupBtn}>View Event</button>
+
+                <p className={styles.popupMeta}>
+                  {event.time} · {event.location}
+                </p>
+
+                <button
+                  className={styles.popupBtn}
+                  onClick={() => navigate(`/events/${event.id}`)}
+                >
+                  View Event
+                </button>
               </div>
             </Popup>
           </Marker>
@@ -288,11 +335,18 @@ const MapPage = () => {
 
       {error && <div className={styles.errorToast}>{error}</div>}
 
-      {/* FAB */}
       <button className={styles.fab} onClick={handleFabClick}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" strokeWidth="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
       </button>
 
@@ -300,6 +354,7 @@ const MapPage = () => {
         <span className={styles.legendItem}>
           <span className={styles.legendDotGreen} /> Current
         </span>
+
         <span className={styles.legendItem}>
           <span className={styles.legendDotBlue} /> Upcoming
         </span>
