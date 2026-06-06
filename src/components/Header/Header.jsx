@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import { FaHome, FaUserCircle, FaStar } from "react-icons/fa";
-import { MdLocationOn } from "react-icons/md";
+import { MdLocationOn, MdAdminPanelSettings } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
 
 import { removeToken } from "../../utils/token";
@@ -11,17 +11,24 @@ import logo from "../../assets/logo.svg";
 import styles from "./Header.module.css";
 
 const Header = ({ isLoggedIn, setIsLoggedIn, profileImage, username }) => {
+const Header = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  profileImage,
+  username,
+  role,
+  setRole
+}) => {
   const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     removeToken();
-
+    localStorage.removeItem("role");
     setIsLoggedIn(false);
-
+    setRole?.(null); // нужно передать setRole в Header
     setOpen(false);
-
     navigate("/login");
   };
 
@@ -53,6 +60,12 @@ const Header = ({ isLoggedIn, setIsLoggedIn, profileImage, username }) => {
               <FaStar />
               <span>saved</span>
             </NavLink>
+            {role?.toLowerCase() === "admin" && (
+              <NavLink to="/admin" className={getNavLinkClass}>
+                <MdAdminPanelSettings />
+                <span>admin</span>
+              </NavLink>
+            )}
           </>
         )}
 

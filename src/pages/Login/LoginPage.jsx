@@ -1,12 +1,12 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 
-import { loginUser } from "../../api/authApi";
-import { setRefreshToken, setToken } from "../../utils/token";
+import { loginUser, getCurrentUser } from "../../api/authApi";
 
 import styles from "./LoginPage.module.css";
+import { setRefreshToken, setToken, getRoleFromToken } from "../../utils/token";
 
-const LoginPage = ({ setIsLoggedIn }) => {
+const LoginPage = ({ setIsLoggedIn, setRole }) => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -45,14 +45,24 @@ const LoginPage = ({ setIsLoggedIn }) => {
       }
 
       setToken(accessToken);
+      if (refreshToken) setRefreshToken(refreshToken);
+      setIsLoggedIn(true);
+
+      // try {
+      //   const userResponse = await getCurrentUser();
+      //   const userRole = userResponse?.data?.role ?? null;
+      //   setRole?.(userRole);
+      //   if (userRole) localStorage.setItem("role", userRole);
+      // } catch {
+      //   // эндпоинт ещё не готов
+      // }
+
+      navigate("/my-events");
 
       if (refreshToken) {
         setRefreshToken(refreshToken);
       }
 
-      setIsLoggedIn(true);
-
-      navigate("/my-events");
     } catch (error) {
       console.error("Login error:", error);
       setErrorMessage("Incorrect email or password.");

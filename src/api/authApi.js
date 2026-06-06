@@ -49,3 +49,7 @@ export const resetPassword = async ({ token, password }) => {
     },
   });
 };
+
+export const getCurrentUser = async () => {
+  return apiClient("/users/me");
+};
