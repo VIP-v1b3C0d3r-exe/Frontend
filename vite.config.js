@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    port: 80,
+    // port: 80,
+    port: 5173,
     allowedHosts: [
       "ec2-51-20-182-189.eu-north-1.compute.amazonaws.com",
     ],

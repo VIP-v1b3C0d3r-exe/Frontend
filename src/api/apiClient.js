@@ -42,7 +42,8 @@ export async function apiClient(endpoint, options = {}) {
 
   if (
     !isPublicEndpoint(endpoint) &&
-    (response.status === 401 || response.status === 403)
+    !options.silent &&
+    response.status === 401
   ) {
     try {
       const storedRefreshToken = localStorage.getItem("refreshToken");
@@ -76,12 +77,11 @@ export async function apiClient(endpoint, options = {}) {
       });
     } catch (refreshError) {
       console.error("Refresh token error:", refreshError);
-
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
-
-      window.location.href = "/login";
-
+      if (!options.silent) {
+        window.location.href = "/login";
+      }
       throw refreshError;
     }
   }

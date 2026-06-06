@@ -9,20 +9,25 @@ import EventMapPage from "./pages/MapView/MapPage";
 import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
-import { getToken } from "./utils/token";
+import { getToken, getRoleFromToken } from "./utils/token";
+import AdminPage from "./pages/Admin/AdminPage";
 
 function AppContent() {
   const location = useLocation();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!getToken());
+  const [role, setRole] = useState("admin"); // временно для теста
+  // const [role, setRole] = useState(() => localStorage.getItem("role") ?? null);
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState("guest");
 
   useEffect(() => {
     const token = getToken();
-
     if (token) {
       setIsLoggedIn(true);
+      // временно закомментировано — role захардкожена как "admin"
+      // const savedRole = localStorage.getItem("role");
+      // setRole(savedRole);
     }
   }, []);
 
@@ -38,6 +43,8 @@ function AppContent() {
           setIsLoggedIn={setIsLoggedIn}
           profileImage={profileImage}
           username={username}
+          role={role}
+          setRole={setRole}
         />
       )}
 
@@ -46,7 +53,7 @@ function AppContent() {
 
         <Route
           path="/login"
-          element={<LoginPage setIsLoggedIn={setIsLoggedIn} />}
+          element={<LoginPage setIsLoggedIn={setIsLoggedIn} setRole={setRole} />}
         />
 
         <Route
@@ -87,6 +94,11 @@ function AppContent() {
           element={
             isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />
           }
+        />
+
+        <Route
+          path="/admin"
+          element={isLoggedIn ? <AdminPage /> : <Navigate to="/login" replace />}
         />
       </Routes>
     </>
