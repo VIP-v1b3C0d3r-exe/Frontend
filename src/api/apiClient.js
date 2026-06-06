@@ -10,16 +10,20 @@ const PUBLIC_ENDPOINTS = [
   "/auth/reset-password",
 ];
 
-const isPublicEndpoint = (endpoint) => {
-  return PUBLIC_ENDPOINTS.some((publicEndpoint) =>
+const isPublicEndpoint = (endpoint) =>
+  PUBLIC_ENDPOINTS.some((publicEndpoint) =>
     endpoint.startsWith(publicEndpoint)
   );
-};
 
 export async function apiClient(endpoint, options = {}) {
   let token = localStorage.getItem("token");
 
   const url = `${API_URL}${endpoint}`;
+
+  const body =
+    options.body && typeof options.body !== "string"
+      ? JSON.stringify(options.body)
+      : options.body;
 
   console.log("[API REQUEST]", {
     url,
@@ -31,6 +35,7 @@ export async function apiClient(endpoint, options = {}) {
 
   let response = await fetch(url, {
     ...options,
+    body,
     headers: {
       "Content-Type": "application/json",
       ...(!isPublicEndpoint(endpoint) && token
@@ -65,12 +70,12 @@ export async function apiClient(endpoint, options = {}) {
 
       token = newAccessToken;
 
-    
       response = await fetch(url, {
         ...options,
+        body,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          Authorization: `Bearer ${token}`,
           ...options.headers,
         },
       });
@@ -89,8 +94,14 @@ export async function apiClient(endpoint, options = {}) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
 
-    throw new Error(error?.error?.message ?? `HTTP ${response.status}`);
+    throw new Error(
+      error?.error?.message || error?.message || `HTTP ${response.status}`
+    );
   }
 
-  return response.json();
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json().catch(() => null);
 }

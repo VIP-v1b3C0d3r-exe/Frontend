@@ -1,7 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./EventDetail.module.css";
-import { fetchEvent, joinEvent, leaveEvent, fetchTags } from "../../api/eventsApi";
+import {
+  fetchEvent,
+  joinEvent,
+  leaveEvent,
+  fetchTags,
+} from "../../api/eventsApi";
 import { apiClient } from "../../api/apiClient";
 
 const DEFAULT_IMAGE =
@@ -19,7 +24,7 @@ const EventDetail = () => {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadEventData = async () => {
+  const loadEventData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -50,11 +55,11 @@ const EventDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     loadEventData();
-  }, [id]);
+  }, [loadEventData]);
 
   const handleJoin = async () => {
     setJoining(true);

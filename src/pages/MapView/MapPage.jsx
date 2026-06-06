@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  ZoomControl,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./MapPage.module.css";
@@ -208,7 +215,9 @@ const MapPage = () => {
 
   return (
     <div className={styles.mapPage}>
-      <div className={`${styles.topBar} ${anyPanelOpen ? styles.topBarShifted : ""}`}>
+      <div
+        className={`${styles.topBar} ${anyPanelOpen ? styles.topBarShifted : ""}`}
+      >
         {!anyPanelOpen && (
           <div className={styles.searchBox}>
             <input
@@ -309,7 +318,9 @@ const MapPage = () => {
               <div className={styles.popupContent}>
                 <span
                   className={`${styles.popupStatus} ${
-                    event.status === "current" ? styles.current : styles.upcoming
+                    event.status === "current"
+                      ? styles.current
+                      : styles.upcoming
                   }`}
                 >
                   {event.status === "current" ? "Now" : "Upcoming"}
