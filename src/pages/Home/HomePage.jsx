@@ -1,7 +1,5 @@
 import mapBg from "../../assets/HomeBag.svg";
 import homeFig from "../../assets/HomeFig.svg";
-import { LuSearch } from "react-icons/lu";
-
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
@@ -12,13 +10,7 @@ const HomePage = () => {
 
         <div className={styles.logoBlock}>
           <h1 className={styles.logoTitle}>
-            <span className={styles.lightText}>E</span>
-            LOCAT
-            <span className={styles.oWrapper}>
-              O
-              <LuSearch className={styles.logoMagnifier} />
-            </span>
-            R
+            <span className={styles.lightText}>E</span>LOCATOR
           </h1>
 
           <p className={styles.logoSubtitle}>GLOBAL EVENT LOCATOR</p>

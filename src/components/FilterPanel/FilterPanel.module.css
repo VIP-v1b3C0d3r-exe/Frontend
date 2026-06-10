@@ -1,415 +1,411 @@
 /* Slide animation */
 .panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 460px;
-  max-width: 460px;
-  background: white;
-  z-index: 999;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
-}
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 460px;
+    max-width: 460px;
+    background: white;
+    z-index: 999;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .panelOpen {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .panelClosed {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  /* Search + close */
+  .searchRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+  }
+  
+  .searchBox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 8px 16px;
+    flex: 1;
+  }
+  
+  .searchInput {
+    border: none;
+    outline: none;
+    font-size: 18px;
+    width: 100%;
+    background: transparent;
+    color: #222;
+  }
+  
+  .searchInput::placeholder {
+    color: #aaa;
+  }
+  
+  .closeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: color 0.2s, background 0.2s;
+  }
+  
+  .closeBtn:hover {
+    color: #222;
+    background: #f0f0f0;
+  }
+  
+  /* Filter buttons row */
+  .filterBtnsRow {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  
+  .dropdownWrap {
+    position: relative;
+  }
+  
+  .filterBtn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: white;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  
+  .filterBtn:hover {
+    border-color: #aaa;
+  }
+  
+  .filterBtnActive {
+    background: #f0f7f5;
+    border-color: #7E9C92;
+    color: #4a7a6e;
+  }
+  
+  .filterBadge {
+    background: #7E9C92;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    z-index: 100;
+    min-width: 200px;
+  }
+  
+  .dropdownContent {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .dropdownLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .dropdownInput {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: #333;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+  
+  .dropdownInput:focus {
+    border-color: #7E9C92;
+  }
+  
+  .dropdownHint {
+    font-size: 12px;
+    color: #aaa;
+    margin: 0;
+  }
+  
+  .ampmRow {
+    display: flex;
+    gap: 6px;
+  }
+  
+  .ampmBtn {
+    flex: 1;
+    padding: 6px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .ampmBtn:hover {
+    border-color: #7E9C92;
+  }
+  
+  .ampmActive {
+    background: #7E9C92;
+    border-color: #7E9C92;
+    color: white;
+  }
+  
+  /* Category header */
+  .categoryHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px 4px;
+    flex-shrink: 0;
+  }
+  
+  .panelTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  
+  .count {
+    font-size: 12px;
+    font-weight: 500;
+    background: #f0f0f0;
+    color: #666;
+    border-radius: 20px;
+    padding: 2px 8px;
+  }
+  
+  .treeNode {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    cursor: pointer;
+  }
+  
+  .checkbox {
+    accent-color: #7E9C92;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  
+  .checkboxText {
+    font-size: 13px;
+    color: #222;
+    font-weight: 500;
+  }
+  
+  /* Event list */
+  .list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: calc(100vh - 280px); /* ограничение высоты */
+  }
+  
+  .empty {
+    text-align: center;
+    color: #aaa;
+    font-size: 14px;
+    margin-top: 40px;
+  }
+  
+  .card {
+    display: flex;
+    gap: 0;
+    background: white;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+    flex-shrink: 0; /* карточки не сжимаются */
+  }
+  
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .cardImage {
+    width: 200px;   /* уменьши с 200px */
+    height: 140px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  
+  .cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    justify-content: center;
+    flex: 1;
+  }
+  
+  .cardTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    /* обрезать длинные названия */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .cardMeta {
+    font-size: 11px;
+    color: #888;
+    margin: 0;
+  }
+  
+  .tags {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+  
+  .tag {
+    font-size: 10px;
+    font-weight: 500;
+    background: #f0f0f0;
+    color: #555;
+    border-radius: 20px;
+    padding: 2px 8px;
+  }
+  
+  .tagGreen {
+    background: #d4f5e2;
+    color: #1e7a45;
+  }
+  
+  .tagBlue {
+    background: #dceeff;
+    color: #1a5fad;
+  }
+  
+  .treeBox {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .categoryHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+  }
+  
+  .expandBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+  
+  .treeChildren {
+    margin-left: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 5px 0 10px 0;
+  }
+  
+  .checkboxTextSub {
+    font-size: 13px;
+    color: #666;
+  }
 
-.panelOpen {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.panelClosed {
-  transform: translateX(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Search + close */
-.searchRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 12px 10px;
-  border-bottom: 1px solid #f0f0f0;
-  flex-shrink: 0;
-}
-
-.searchBox {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 8px 16px;
-  flex: 1;
-}
-
-.searchInput {
-  border: none;
-  outline: none;
-  font-size: 18px;
-  width: 100%;
-  background: transparent;
-  color: #222;
-}
-
-.searchInput::placeholder {
-  color: #aaa;
-}
-
-.closeBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #888;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  transition:
-    color 0.2s,
-    background 0.2s;
-}
-
-.closeBtn:hover {
-  color: #222;
-  background: #f0f0f0;
-}
-
-/* Filter buttons row */
-.filterBtnsRow {
-  display: flex;
-  gap: 6px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.dropdownWrap {
-  position: relative;
-}
-
-.filterBtn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: white;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #444;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.filterBtn:hover {
-  border-color: #aaa;
-}
-
-.filterBtnActive {
-  background: #f0f7f5;
-  border-color: #7e9c92;
-  color: #4a7a6e;
-}
-
-.filterBadge {
-  background: #7e9c92;
-  color: white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  z-index: 100;
-  min-width: 200px;
-}
-
-.dropdownContent {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.dropdownLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.dropdownInput {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 7px 10px;
-  font-size: 13px;
-  color: #333;
-  outline: none;
-  width: 100%;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.dropdownInput:focus {
-  border-color: #7e9c92;
-}
-
-.dropdownHint {
-  font-size: 12px;
-  color: #aaa;
-  margin: 0;
-}
-
-.ampmRow {
-  display: flex;
-  gap: 6px;
-}
-
-.ampmBtn {
-  flex: 1;
-  padding: 6px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #444;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ampmBtn:hover {
-  border-color: #7e9c92;
-}
-
-.ampmActive {
-  background: #7e9c92;
-  border-color: #7e9c92;
-  color: white;
-}
-
-/* Category header */
-.categoryHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px 4px;
-  flex-shrink: 0;
-}
-
-.panelTitle {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-.count {
-  font-size: 12px;
-  font-weight: 500;
-  background: #f0f0f0;
-  color: #666;
-  border-radius: 20px;
-  padding: 2px 8px;
-}
-
-.treeNode {
-  display: flex;
-  flex-direction: column;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-  cursor: pointer;
-}
-
-.checkbox {
-  accent-color: #7e9c92;
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.checkboxText {
-  font-size: 13px;
-  color: #222;
-  font-weight: 500;
-}
-
-/* Event list */
-.list {
-  overflow-y: auto;
-  flex: 1;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: calc(100vh - 280px); /* ограничение высоты */
-}
-
-.empty {
-  text-align: center;
-  color: #aaa;
-  font-size: 14px;
-  margin-top: 40px;
-}
-
-.card {
-  display: flex;
-  gap: 0;
-  background: white;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-  flex-shrink: 0; /* карточки не сжимаются */
-}
-
-.card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.cardImage {
-  width: 200px; /* уменьши с 200px */
-  height: 140px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.cardBody {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
-  justify-content: center;
-  flex: 1;
-}
-
-.cardTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
-  /* обрезать длинные названия */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cardMeta {
-  font-size: 11px;
-  color: #888;
-  margin: 0;
-}
-
-.tags {
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 10px;
-  font-weight: 500;
-  background: #f0f0f0;
-  color: #555;
-  border-radius: 20px;
-  padding: 2px 8px;
-}
-
-.tagGreen {
-  background: #d4f5e2;
-  color: #1e7a45;
-}
-
-.tagBlue {
-  background: #dceeff;
-  color: #1a5fad;
-}
-
-.treeBox {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 14px;
-  border-bottom: 1px solid #eee;
-}
-
-.categoryHeaderRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0;
-}
-
-.expandBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #888;
-  display: flex;
-  align-items: center;
-  padding: 5px;
-}
-
-.treeChildren {
-  margin-left: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 5px 0 10px 0;
-}
-
-.checkboxTextSub {
-  font-size: 13px;
-  color: #666;
-}
-
-.dateInputRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.clearDate {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #aaa;
-  font-size: 13px;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.clearDate:hover {
-  color: #555;
-}
+  .dateInputRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .clearDate {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aaa;
+    font-size: 13px;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  
+  .clearDate:hover {
+    color: #555;
+  }

@@ -10,7 +10,6 @@ import { removeToken } from "../../utils/token";
 import logo from "../../assets/logo.svg";
 import styles from "./Header.module.css";
 
-const Header = ({ isLoggedIn, setIsLoggedIn, profileImage, username }) => {
 const Header = ({
   isLoggedIn,
   setIsLoggedIn,
@@ -33,14 +32,18 @@ const Header = ({
   };
 
   const getNavLinkClass = ({ isActive }) =>
-    isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink;
+    isActive
+      ? `${styles.navLink} ${styles.activeLink}`
+      : styles.navLink;
 
   return (
     <header className={styles.header}>
-      <div className={styles.mobileTopStrip} />
-
       <NavLink to="/" className={styles.logoLink}>
-        <img src={logo} alt="logo" className={styles.logo} />
+        <img
+          src={logo}
+          alt="logo"
+          className={styles.logo}
+        />
       </NavLink>
 
       <nav className={styles.nav}>
@@ -51,12 +54,18 @@ const Header = ({
 
         {isLoggedIn && (
           <>
-            <NavLink to="/map" className={getNavLinkClass}>
+            <NavLink
+              to="/map"
+              className={getNavLinkClass}
+            >
               <MdLocationOn />
               <span>map</span>
             </NavLink>
 
-            <NavLink to="/my-events" className={getNavLinkClass}>
+            <NavLink
+              to="/my-events"
+              className={getNavLinkClass}
+            >
               <FaStar />
               <span>saved</span>
             </NavLink>
@@ -103,7 +112,10 @@ const Header = ({
             )}
           </div>
         ) : (
-          <NavLink to="/login" className={getNavLinkClass}>
+          <NavLink
+            to="/login"
+            className={getNavLinkClass}
+          >
             <FaUserCircle />
             <span>guest</span>
           </NavLink>

@@ -11,16 +11,11 @@ import styles from "./TagSearch.module.css";
  *   onCreateTag   – optional: (name: string) => Promise<{ id, name }>
  *                   if provided, shows "Create #name" option when no match found
  */
-const TagSearch = ({
-  tags = [],
-  selectedTags = [],
-  onTagsChange,
-  onCreateTag,
-}) => {
-  const [input, setInput] = useState("");
-  const [focused, setFocused] = useState(false);
+const TagSearch = ({ tags = [], selectedTags = [], onTagsChange, onCreateTag }) => {
+  const [input,    setInput]    = useState("");
+  const [focused,  setFocused]  = useState(false);
   const [creating, setCreating] = useState(false);
-  const inputRef = useRef(null);
+  const inputRef   = useRef(null);
   const dropdownRef = useRef(null);
 
   const suggestions = tags.filter(
@@ -33,9 +28,7 @@ const TagSearch = ({
     (t) => t.name.toLowerCase() === input.toLowerCase()
   );
 
-  const showDropdown =
-    focused &&
-    input.length > 0 &&
+  const showDropdown = focused && input.length > 0 &&
     (suggestions.length > 0 || (onCreateTag && !exactMatch));
 
   const addTag = (name) => {
@@ -64,12 +57,9 @@ const TagSearch = ({
   useEffect(() => {
     const handler = (e) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target) &&
-        inputRef.current &&
-        !inputRef.current.contains(e.target)
-      )
-        setFocused(false);
+        dropdownRef.current && !dropdownRef.current.contains(e.target) &&
+        inputRef.current && !inputRef.current.contains(e.target)
+      ) setFocused(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -80,18 +70,11 @@ const TagSearch = ({
       <p className={styles.label}>Tags</p>
 
       <div className={styles.inputWrap}>
-        <svg
-          className={styles.searchIcon}
-          xmlns="http://www.w3.org/2000/svg"
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <svg className={styles.searchIcon} xmlns="http://www.w3.org/2000/svg"
+             width="13" height="13" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input
           ref={inputRef}
@@ -110,10 +93,7 @@ const TagSearch = ({
             <button
               key={tag.name}
               className={styles.suggestion}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                addTag(tag.name);
-              }}
+              onMouseDown={(e) => { e.preventDefault(); addTag(tag.name); }}
             >
               <span className={styles.suggestionHash}>#</span>
               {tag.name}
@@ -123,10 +103,7 @@ const TagSearch = ({
           {onCreateTag && !exactMatch && input.trim().length > 0 && (
             <button
               className={`${styles.suggestion} ${styles.createSuggestion}`}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                handleCreate();
-              }}
+              onMouseDown={(e) => { e.preventDefault(); handleCreate(); }}
               disabled={creating}
             >
               <span className={styles.suggestionHash}>+</span>
@@ -146,9 +123,7 @@ const TagSearch = ({
                 className={styles.bubbleRemove}
                 onClick={() => removeTag(name)}
                 aria-label={`Remove ${name}`}
-              >
-                ×
-              </button>
+              >×</button>
             </span>
           ))}
         </div>
