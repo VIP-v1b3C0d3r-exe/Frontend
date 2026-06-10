@@ -94,13 +94,9 @@ export async function apiClient(endpoint, options = {}) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
 
-    throw new Error(
-      error?.error?.message || error?.message || `HTTP ${response.status}`
-    );
-  }
-
-  if (response.status === 204) {
-    return null;
+    const msg = error?.error?.message ?? error?.error?.details ?? `HTTP ${response.status}`;
+    console.error("[API ERROR]", response.status, url, error);
+    throw new Error(msg);
   }
 
   return response.json().catch(() => null);

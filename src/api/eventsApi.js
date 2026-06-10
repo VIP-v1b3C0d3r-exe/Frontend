@@ -121,6 +121,7 @@ const normaliseEvent = (event) => {
     categoryIds: event.categoryIds ?? [],
     maxParticipants: event.maxParticipants ?? null,
     ageRestriction: event.ageRestriction ?? 0,
+    createdBy: event.createdBy ?? null, 
   };
 };
 

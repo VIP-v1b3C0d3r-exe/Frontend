@@ -27,9 +27,13 @@ jobs:
             echo "Installing packages..."
             npm install
 
+            echo "Building application..."
+            npm run build
+
             echo "Restarting application..."
-            pm2 delete frontend
-            pm2 start npm --name "frontend" -- run dev -- --host 0.0.0.0
+            pm2 delete frontend || true
+            
+            pm2 start npm --name "frontend" -- run dev -- --host 0.0.0.0 --port 80
 
             pm2 save
 
