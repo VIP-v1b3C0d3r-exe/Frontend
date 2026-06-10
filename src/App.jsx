@@ -16,8 +16,7 @@ function AppContent() {
   const location = useLocation();
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getToken());
-  const [role, setRole] = useState("admin"); // временно для теста
-  // const [role, setRole] = useState(() => localStorage.getItem("role") ?? null);
+  const [role, setRole] = useState(() => localStorage.getItem("role") ?? null);
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState("guest");
 
@@ -25,9 +24,8 @@ function AppContent() {
     const token = getToken();
     if (token) {
       setIsLoggedIn(true);
-      // временно закомментировано — role захардкожена как "admin"
-      // const savedRole = localStorage.getItem("role");
-      // setRole(savedRole);
+      const savedRole = localStorage.getItem("role");
+      setRole(savedRole);
     }
   }, []);
 
