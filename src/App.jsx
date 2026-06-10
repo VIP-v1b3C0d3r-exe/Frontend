@@ -17,16 +17,11 @@ import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 
-import { getToken } from "./utils/token";
 import { getToken, getRoleFromToken } from "./utils/token";
 import AdminPage from "./pages/Admin/AdminPage";
 
 function AppContent() {
   const location = useLocation();
-
-  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getToken()));
-  const [profileImage, setProfileImage] = useState(null);
-  const [username, setUsername] = useState("guest");
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getToken());
   const [role, setRole] = useState(() => localStorage.getItem("role") ?? null);
