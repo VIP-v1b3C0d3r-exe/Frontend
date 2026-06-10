@@ -22,23 +22,20 @@ const EventDetail = () => {
   const loadEventData = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const ev = await fetchEvent(id);
       setEvent(ev);
-
+  
       const partData = await apiClient(`/events/${id}/participants`);
       const parts = partData.data ?? [];
       setParticipants(parts);
 
-      const me = localStorage.getItem("username");
-
-      if (me) {
-        setJoined(parts.some((participant) => participant.username === me));
+      const meUsername = localStorage.getItem("username");
+      if (meUsername) {
+        setJoined(parts.some((p) => p.username === meUsername));
       }
-
+  
       const allTags = await fetchTags();
-
       if (ev.tagIds?.length > 0) {
         setTags(allTags.filter((tag) => ev.tagIds.includes(tag.id)));
       } else {
@@ -58,7 +55,6 @@ const EventDetail = () => {
 
   const handleJoin = async () => {
     setJoining(true);
-
     try {
       if (joined) {
         await leaveEvent(id);
@@ -67,9 +63,15 @@ const EventDetail = () => {
         await joinEvent(id);
         setJoined(true);
       }
-
+  
       const partData = await apiClient(`/events/${id}/participants`);
-      setParticipants(partData.data ?? []);
+      const parts = partData.data ?? [];
+      setParticipants(parts);
+  
+      const meUsername = localStorage.getItem("username");
+      if (meUsername) {
+        setJoined(parts.some((p) => p.username === meUsername));
+      }
     } catch (err) {
       console.error("Join/leave failed:", err);
       alert("Could not update participation. Please try again.");
