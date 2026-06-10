@@ -39,24 +39,6 @@
     box-shadow: 0 6px 18px rgba(0,0,0,0.11);
   }
   
-  .dismiss {
-    position: absolute;
-    top: 10px;
-    right: 13px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 17px;
-    color: rgba(60,60,60,0.45);
-    line-height: 1;
-    padding: 0 2px;
-    transition: color 0.15s;
-  }
-  
-  .dismiss:hover {
-    color: rgba(60,60,60,0.8);
-  }
-  
   .cardInfo {
     display: flex;
     flex-direction: column;

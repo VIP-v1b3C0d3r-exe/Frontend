@@ -41,12 +41,14 @@ const LoginPage = ({ setIsLoggedIn, setRole }) => {
       if (refreshToken) setRefreshToken(refreshToken);
       setIsLoggedIn(true);
 
-      // получаем роль через /users/me
       try {
         const userResponse = await apiClient("/users/me");
-        const userRole = userResponse?.data?.role ?? null;
+        const user = userResponse?.data;
+        const userRole = user?.role ?? null;
         setRole?.(userRole);
         if (userRole) localStorage.setItem("role", userRole);
+        if (user?.id) localStorage.setItem("userId", String(user.id));
+        if (user?.username) localStorage.setItem("username", user.username);
       } catch {
         // игнорируем если не работает
       }
