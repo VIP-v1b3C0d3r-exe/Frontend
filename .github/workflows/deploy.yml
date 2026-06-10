@@ -33,7 +33,7 @@ jobs:
             echo "Restarting application..."
             pm2 delete frontend || true
             
-            pm2 start npm --name "frontend" -- run preview
+            pm2 start npm --name "frontend" -- run dev -- --host 0.0.0.0 --port 80
 
             pm2 save
 
