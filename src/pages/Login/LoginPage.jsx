@@ -1,7 +1,7 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
-
-import { loginUser, getCurrentUser } from "../../api/authApi";
+import { apiClient } from "../../api/apiClient";
+import { loginUser } from "../../api/authApi";
 
 import styles from "./LoginPage.module.css";
 import { setRefreshToken, setToken, getRoleFromToken } from "../../utils/token";
@@ -16,53 +16,43 @@ const LoginPage = ({ setIsLoggedIn, setRole }) => {
   const handleLogin = async (event) => {
     event.preventDefault();
     setErrorMessage("");
-    
+  
     try {
-      const response = await loginUser({
-        email,
-        password,
-      });
-
+      const response = await loginUser({ email, password });
+  
       console.log("Login response:", response);
-
+  
       const accessToken =
         response?.data?.access_token ||
         response?.data?.accessToken ||
-        response?.data?.token ||
-        response?.access_token ||
-        response?.accessToken ||
-        response?.token;
-
+        response?.access_token;
+  
       const refreshToken =
         response?.data?.refresh_token ||
         response?.data?.refreshToken ||
-        response?.refresh_token ||
-        response?.refreshToken;
-
+        response?.refresh_token;
+  
       if (!accessToken) {
         setErrorMessage("Login failed. Access token was not received.");
         return;
       }
-
+  
       setToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
       setIsLoggedIn(true);
 
-      // try {
-      //   const userResponse = await getCurrentUser();
-      //   const userRole = userResponse?.data?.role ?? null;
-      //   setRole?.(userRole);
-      //   if (userRole) localStorage.setItem("role", userRole);
-      // } catch {
-      //   // эндпоинт ещё не готов
-      // }
-
-      navigate("/my-events");
-
-      if (refreshToken) {
-        setRefreshToken(refreshToken);
+      // получаем роль через /users/me
+      try {
+        const userResponse = await apiClient("/users/me");
+        const userRole = userResponse?.data?.role ?? null;
+        setRole?.(userRole);
+        if (userRole) localStorage.setItem("role", userRole);
+      } catch {
+        // игнорируем если не работает
       }
 
+      navigate("/my-events");
+  
     } catch (error) {
       console.error("Login error:", error);
       setErrorMessage("Incorrect email or password.");
