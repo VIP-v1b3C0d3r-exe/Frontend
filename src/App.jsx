@@ -1,5 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { useState } from "react";
+
 import Header from "./components/Header/Header";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
@@ -9,11 +16,17 @@ import EventMapPage from "./pages/MapView/MapPage";
 import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
+
+import { getToken } from "./utils/token";
 import { getToken, getRoleFromToken } from "./utils/token";
 import AdminPage from "./pages/Admin/AdminPage";
 
 function AppContent() {
   const location = useLocation();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getToken()));
+  const [profileImage, setProfileImage] = useState(null);
+  const [username, setUsername] = useState("guest");
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getToken());
   const [role, setRole] = useState(() => localStorage.getItem("role") ?? null);
@@ -30,7 +43,6 @@ function AppContent() {
   }, []);
 
   const hideHeaderRoutes = ["/login", "/register", "/forgot-password"];
-
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
 
   return (
@@ -79,7 +91,7 @@ function AppContent() {
             isLoggedIn ? <EventDetailPage /> : <Navigate to="/login" replace />
           }
         />
-        
+
         <Route
           path="/my-events"
           element={

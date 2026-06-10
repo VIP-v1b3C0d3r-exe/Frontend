@@ -1,262 +1,262 @@
 .mapPage {
-    height: calc(100vh - 72px);
-    position: relative;
-    overflow: hidden;
-  }
+  height: calc(100vh - 72px);
+  position: relative;
+  overflow: hidden;
+}
 
-  .topBar {
-    position: absolute;
-    top: 16px;
-    left: 30px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    max-width: calc(100% - 32px);
-  }
-  
-  .topBarShifted {
-    left: 480px;
-  }
+.topBar {
+  position: absolute;
+  top: 16px;
+  left: 30px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+}
 
-  .searchBox {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 10px;
-    padding: 8px 16px;
-    width: 300px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    gap: 10px;
-    border: 1px solid #f0f0f0;
-    box-sizing: border-box;
-  }
-  
-  .searchBtn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #888;
-    display: flex;
-    align-items: center;
-    padding: 0;
-    flex-shrink: 0;
-    transition: color 0.2s;
-  }
-  
-  .searchBtn:hover {
-    color: #333;
-  }
-  
-  .searchInput {
-    border: none;
-    outline: none;
-    font-size: 18px;
-    width: 100%;
-    color: #222;
-    background: transparent;
-  }
-  
-  .searchInput::placeholder {
-    color: #aaa;
-  }
-  
-  .searchIcon {
-    color: #888;
-    flex-shrink: 0;
-  }
-  
-  .filters {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-  }
-  
-  .filterChip {
-    background: white;
-    border: 1.5px solid #e8e8e8;
-    border-radius: 20px;
-    padding: 8px 24px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #444;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  
-  .filterChip:hover {
-    border-color: #7E9C92;
-    color: #444;
-  }
-  
-  .filterChipActive {
-    background: #7E9C92;
-    border-color: #7E9C92;
-    color: white;
-    box-shadow: 0 2px 8px rgba(59, 126, 219, 0.35);
-  }
+.topBarShifted {
+  left: 480px;
+}
 
-  .filterChipActive:hover {
-    color: white;
-  }
-  
-  .map {
-    height: 100%;
-    width: 100%;
-  }
- 
-  .popupContent {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 160px;
-  }
-  
-  .popupStatus {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: 10px;
-    padding: 2px 8px;
-    width: fit-content;
-  }
-  
-  .current {
-    background: #d4f5e2;
-    color: #1e7a45;
-  }
-  
-  .upcoming {
-    background: #dceeff;
-    color: #1a5fad;
-  }
-  
-  .popupTitle {
-    font-size: 15px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-  }
-  
-  .popupMeta {
-    font-size: 12px;
-    color: #777;
-    margin: 0;
-  }
-  
-  .popupBtn {
-    margin-top: 4px;
-    background: #1a1a1a;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .popupBtn:hover {
-    background: #333;
-  }
+.searchBox {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 8px 16px;
+  width: 300px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  gap: 10px;
+  border: 1px solid #f0f0f0;
+  box-sizing: border-box;
+}
 
-  .legend {
-    position: absolute;
-    bottom: 40px;
-    right: 16px;
-    z-index: 1000;
-    background: white;
-    border-radius: 12px;
-    padding: 8px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
-  }
-  
-  .legendItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #444;
-    font-weight: 500;
-  }
-  
-  .legendDotGreen {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #3dba6e;
-    flex-shrink: 0;
-  }
-  
-  .legendDotBlue {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #3b7edb;
-    flex-shrink: 0;
-  }
+.searchBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
 
-  .fab {
-    position: absolute;
-    bottom: 110px;
-    right: 16px;
-    z-index: 1000;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #584D92;
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 4px 16px rgba(54, 54, 54, 0.95);
-    justify-content: center;
-    transition: transform 0.2s;
-  }
-  
-  .fab:hover {
-    transform: scale(1.08);
-  }
-  
-  .locateBtn {
-    position: absolute;
-    bottom: 190px;
-    right: 16px;
-    z-index: 1000;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #7E9C92;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(54, 54, 54, 0.25);
-    color: #ffffff;
-    transition: transform 0.2s;
-  }
-  
-  .locateBtn:hover {
-    transform: scale(1.08);
-  }
+.searchBtn:hover {
+  color: #333;
+}
 
-  .map :global(.leaflet-bottom.leaflet-right) {
-    bottom: 50%;
-    right: 8px;
-  }
-  .map :global(.leaflet-control-attribution) {
-    display: none;
-  }
+.searchInput {
+  border: none;
+  outline: none;
+  font-size: 18px;
+  width: 100%;
+  color: #222;
+  background: transparent;
+}
+
+.searchInput::placeholder {
+  color: #aaa;
+}
+
+.searchIcon {
+  color: #888;
+  flex-shrink: 0;
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.filterChip {
+  background: white;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 20px;
+  padding: 8px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #444;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filterChip:hover {
+  border-color: #7e9c92;
+  color: #444;
+}
+
+.filterChipActive {
+  background: #7e9c92;
+  border-color: #7e9c92;
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 126, 219, 0.35);
+}
+
+.filterChipActive:hover {
+  color: white;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+.popupContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.popupStatus {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 10px;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
+.current {
+  background: #d4f5e2;
+  color: #1e7a45;
+}
+
+.upcoming {
+  background: #dceeff;
+  color: #1a5fad;
+}
+
+.popupTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.popupMeta {
+  font-size: 12px;
+  color: #777;
+  margin: 0;
+}
+
+.popupBtn {
+  margin-top: 4px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.popupBtn:hover {
+  background: #333;
+}
+
+.legend {
+  position: absolute;
+  bottom: 40px;
+  right: 16px;
+  z-index: 1000;
+  background: white;
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #444;
+  font-weight: 500;
+}
+
+.legendDotGreen {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3dba6e;
+  flex-shrink: 0;
+}
+
+.legendDotBlue {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3b7edb;
+  flex-shrink: 0;
+}
+
+.fab {
+  position: absolute;
+  bottom: 110px;
+  right: 16px;
+  z-index: 1000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #584d92;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(54, 54, 54, 0.95);
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.fab:hover {
+  transform: scale(1.08);
+}
+
+.locateBtn {
+  position: absolute;
+  bottom: 190px;
+  right: 16px;
+  z-index: 1000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #7e9c92;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(54, 54, 54, 0.25);
+  color: #ffffff;
+  transition: transform 0.2s;
+}
+
+.locateBtn:hover {
+  transform: scale(1.08);
+}
+
+.map :global(.leaflet-bottom.leaflet-right) {
+  bottom: 50%;
+  right: 8px;
+}
+.map :global(.leaflet-control-attribution) {
+  display: none;
+}
 
 .mapPicking {
   cursor: crosshair !important;
@@ -268,13 +268,13 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 1001;
-  background: #584D92;
+  background: #584d92;
   color: white;
   border-radius: 20px;
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   pointer-events: none;
   white-space: nowrap;
 }
