@@ -1,7 +1,7 @@
 .homePage {
-  height: calc(100dvh - 72px);
+  min-height: calc(100vh - 72px);
   background: #f0f3e5;
-  overflow: hidden;
+  overflow-x: hidden;
   font-family: "Inter", sans-serif;
 }
 
@@ -11,7 +11,7 @@
   overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .mapBackground {
@@ -20,9 +20,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.12) translateY(22px);
-  opacity: 0.95;
-  filter: brightness(0.96);
+  transform: scale(1.15) translateY(30px);
+  opacity: 1;
+  filter: brightness(0.95);
   z-index: 1;
 }
 
@@ -30,13 +30,13 @@
   position: relative;
   z-index: 2;
   text-align: center;
-  margin-top: 78px;
+  transform: translateY(-28px);
 }
 
 .logoTitle {
   margin: 0;
   font-size: clamp(58px, 8vw, 105px);
-  line-height: 0.9;
+  line-height: 1;
   font-weight: 800;
   color: #6551a8;
 }
@@ -46,30 +46,31 @@
 }
 
 .logoSubtitle {
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: clamp(20px, 2.5vw, 34px);
-  line-height: 1;
   font-weight: 700;
   color: #90a59a;
 }
 
 .contentSection {
   position: relative;
-  margin-top: -250px;
-  height: calc(100dvh - 220px);
+  margin-top: -145px;
+  min-height: 540px;
+  display: flex;
+  justify-content: center;
   overflow: hidden;
   z-index: 5;
 }
 
 .shapeBackground {
   position: absolute;
-  top: -260px;
+  top: -350px;
   left: 50%;
-  width: 130vw;
-  min-width: 130vw;
-  height: 850px;
+  width: 100%;
+  min-width: 900px;
+  height: 1020px;
+  object-fit: cover;
   transform: translateX(-50%);
-  object-fit: fill;
   z-index: 1;
   pointer-events: none;
 }
@@ -77,113 +78,80 @@
 .contentBox {
   position: relative;
   z-index: 2;
-  width: 780px;
-  padding-top: 190px;
-  margin-left: 10vw;
+  width: 501px;
+  padding: 142px 0 120px;
+  margin-left: -190px;
 }
 
 .title {
-  margin: 0 0 26px;
-  font-size: 42px;
-  line-height: 1.08;
-  font-weight: 800;
+  margin: 0 0 22px;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 700;
   color: #6551a8;
 }
 
 .description {
-  max-width: 780px;
+  max-width: 501px;
   margin: 0;
-  font-size: 23px;
-  line-height: 1.45;
+  font-size: 17px;
+  line-height: 1.28;
   color: #8f8b98;
   font-weight: 500;
 }
 
 .tags {
-  margin-top: 80px;
+  margin-top: 38px;
   display: flex;
-  align-items: center;
   flex-wrap: nowrap;
-  gap: 48px;
-  white-space: nowrap;
-  font-size: 18px;
-  font-weight: 800;
+  gap: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: #97a58a;
 }
 
-.tags span {
-  max-width: none;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
+.tags span:not(:last-child)::after {
+  content: " ▷";
+  margin-left: 12px;
 }
 
-.tags span::after {
-  content: "▷";
-  margin-left: 14px;
-  font-weight: 500;
-  color: #97a58a;
-}
-
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .heroSection {
-    height: 360px;
+    height: 300px;
+  }
+
+  .mapBackground {
+    transform: scale(1.3) translateY(20px);
+  }
+
+  .logoBlock {
+    transform: translateY(-10px);
   }
 
   .contentSection {
-    margin-top: -205px;
-    height: calc(100dvh - 155px);
-    overflow: hidden;
+    margin-top: -70px;
+    min-height: 460px;
   }
 
   .shapeBackground {
-    top: -170px;
-    left: 50%;
-    width: 130vw;
-    min-width: 130vw;
-    height: 720px;
-    transform: translateX(-50%);
-    object-fit: fill;
+    top: -120px;
+    min-width: 900px;
+    height: 700px;
   }
 
   .contentBox {
-    width: min(700px, 78vw);
-    margin-left: 12vw;
-    padding-top: 210px;
-  }
-
-  .title {
-    font-size: 36px;
-  }
-
-  .description {
-    max-width: 700px;
-    font-size: 19px;
-    line-height: 1.35;
+    width: 90vw;
+    padding: 95px 20px 80px;
+    margin-left: 0;
   }
 
   .tags {
-    gap: 24px;
-    font-size: 16px;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-}
 
-.oWrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.logoMagnifier {
-  position: absolute;
-  left: 56%;
-  top: 52%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
-  color: #7e9c92;
-
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-
-  pointer-events: none;
-  z-index: 3;
+  .tags span::after {
+    display: none;
+  }
 }

@@ -1,22 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./EventForm.module.css";
 import TagSearch from "../TagSearch/TagSearch";
-import {
-  fetchCategories,
-  fetchTags,
-  createEvent,
-  createTag,
-} from "../../api/eventsApi";
+import { fetchCategories, fetchTags, createEvent, createTag } from "../../api/eventsApi";
 import { reverseGeocode } from "../../utils/geocode";
 
 const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
-  const [categories, setCategories] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [categories,    setCategories]    = useState([]);
+  const [tags,          setTags]          = useState([]);
   const [selectedTagNames, setSelectedTagNames] = useState([]);
-  const [, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [imageFile,     setImageFile]     = useState(null);
+  const [imagePreview,  setImagePreview]  = useState(null);
+  const [submitting,    setSubmitting]    = useState(false);
+  const [error,         setError]         = useState(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -36,11 +31,14 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
 
   useEffect(() => {
     if (!pickedPosition) return;
-
+  
     const loadAddress = async () => {
-      const geo = await reverseGeocode(pickedPosition.lat, pickedPosition.lng);
-
-      setForm((f) => ({
+      const geo = await reverseGeocode(
+        pickedPosition.lat,
+        pickedPosition.lng
+      );
+  
+      setForm(f => ({
         ...f,
         lat: pickedPosition.lat,
         lng: pickedPosition.lng,
@@ -49,7 +47,7 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
         country: geo?.country ?? "",
       }));
     };
-
+  
     loadAddress();
   }, [pickedPosition]);
 
@@ -58,13 +56,11 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
     fetchTags().then(setTags).catch(console.error);
   }, []);
 
-  const set = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+  const set = (field, value) => setForm(f => ({ ...f, [field]: value }));
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-
     if (!file) return;
-
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -74,18 +70,18 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
       setError("Please fill in title, date and times.");
       return;
     }
-
+  
     setSubmitting(true);
     setError(null);
-
+  
     try {
       const startTime = `${form.date}T${form.start_time}:00`;
-      const endTime = `${form.date}T${form.end_time}:00`;
+      const endTime   = `${form.date}T${form.end_time}:00`;
 
       const tagIds = selectedTagNames
         .map((name) => tags.find((t) => t.name === name)?.id)
         .filter(Boolean);
-
+  
       const payload = {
         title: form.title,
         description: form.description,
@@ -99,35 +95,26 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
         ageRestriction: Number(form.age_restriction),
         imageUrl: imagePreview ?? null,
         categoryIds: form.category_id ? [Number(form.category_id)] : [],
-        tagIds,
+        tagIds,  // ← сразу в теле
       };
-
-      const newEvent = await createEvent(payload);
+  
+      const newEvent = await createEvent(payload); // без tagIds
 
       if (form.category_id && newEvent?.id) {
         await fetch(
           `${import.meta.env.VITE_API_URL}/events/${newEvent.id}/categories/${form.category_id}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        ).catch((e) => console.warn("Category failed:", e));
+          { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        ).catch(e => console.warn("Category failed:", e));
       }
 
       for (const tagId of tagIds) {
         await fetch(
           `${import.meta.env.VITE_API_URL}/events/${newEvent.id}/tags/${tagId}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        ).catch((e) => console.warn("Tag failed:", e));
+          { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        ).catch(e => console.warn("Tag failed:", e));
       }
-
+  
+      // RESET
       setForm({
         title: "",
         description: "",
@@ -143,14 +130,15 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
         end_time: "16:00",
         max_participants: 10,
       });
-
+  
       setSelectedTagNames([]);
       setImageFile(null);
       setImagePreview(null);
       setError(null);
-
+  
       onCreated?.();
       onClose();
+  
     } catch (err) {
       setError(err.message ?? "Failed to create event.");
     } finally {
@@ -159,111 +147,77 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
   };
 
   return (
-    <div
-      className={`${styles.panel} ${
-        isOpen ? styles.panelOpen : styles.panelClosed
-      }`}
-    >
+    <div className={`${styles.panel} ${isOpen ? styles.panelOpen : styles.panelClosed}`}>
+      {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.title}>Add your Event</h2>
-
         <button className={styles.closeBtn} onClick={onClose}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       </div>
 
       <div className={styles.body}>
+
+        {/* Image upload */}
         <label className={styles.imageUpload}>
           {imagePreview ? (
-            <img
-              src={imagePreview}
-              alt="preview"
-              className={styles.imagePreview}
-            />
+            <img src={imagePreview} alt="preview" className={styles.imagePreview} />
           ) : (
             <div className={styles.imagePlaceholder}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
               </svg>
-
               <span>Upload cover image</span>
             </div>
           )}
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            hidden
-          />
+          <input type="file" accept="image/*" onChange={handleImageChange} hidden />
         </label>
-
         {imagePreview && (
-          <button
-            className={styles.imageRemove}
-            onClick={() => {
-              setImageFile(null);
-              setImagePreview(null);
-            }}
-          >
+          <button className={styles.imageRemove}
+            onClick={() => { setImageFile(null); setImagePreview(null); }}>
             Remove photo
           </button>
         )}
 
+        {/* Title */}
         <input
           className={styles.input}
           placeholder="Event name"
           value={form.title}
-          onChange={(e) => set("title", e.target.value)}
+          onChange={e => set("title", e.target.value)}
         />
 
+        {/* Description */}
         <textarea
           className={styles.textarea}
           placeholder="What's this event about?"
           value={form.description}
-          onChange={(e) => set("description", e.target.value)}
+          onChange={e => set("description", e.target.value)}
         />
 
+        {/* Category + Age */}
         <div className={styles.row}>
           <select
             className={styles.select}
             value={form.category_id}
-            onChange={(e) => set("category_id", e.target.value)}
+            onChange={e => set("category_id", e.target.value)}
           >
             <option value="">Event type</option>
-
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
 
           <select
             className={styles.select}
             value={form.age_restriction}
-            onChange={(e) => set("age_restriction", e.target.value)}
+            onChange={e => set("age_restriction", e.target.value)}
           >
             <option value={0}>Any age</option>
             <option value={12}>12+</option>
@@ -273,10 +227,11 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
           </select>
         </div>
 
+        {/* Tags — using TagSearch component */}
         <TagSearch
           onCreateTag={async (name) => {
             const newTag = await createTag(name);
-            setTags((prev) => [...prev, { id: newTag?.id, name }]);
+            setTags(prev => [...prev, { id: newTag?.id, name }]);
             return newTag;
           }}
           tags={tags}
@@ -284,101 +239,68 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
           onTagsChange={setSelectedTagNames}
         />
 
+        {/* Location */}
         <p className={styles.sectionLabel}>Location</p>
-
         <div className={styles.locationRow}>
           <div className={styles.locationInputs}>
             <input
               className={styles.input}
               placeholder="Country"
               value={form.country}
-              onChange={(e) => set("country", e.target.value)}
+              onChange={e => set("country", e.target.value)}
             />
-
             <input
               className={styles.input}
               placeholder="City"
               value={form.city}
-              onChange={(e) => set("city", e.target.value)}
+              onChange={e => set("city", e.target.value)}
             />
-
             <input
               className={styles.input}
               placeholder="Address (optional)"
               value={form.address ?? ""}
-              onChange={(e) => set("address", e.target.value)}
+              onChange={e => set("address", e.target.value)}
             />
-
             {form.lat && form.lng && (
               <p className={styles.coordsHint}>
                 📍 {form.lat.toFixed(4)}, {form.lng.toFixed(4)}
               </p>
             )}
           </div>
-
-          <button
-            type="button"
-            className={styles.mapPickBtn}
-            onClick={() => onClose("picking")}
-          >
+          <button type="button" className={styles.mapPickBtn} onClick={() => onClose("picking")}>
             Choose on map
           </button>
         </div>
 
+        {/* Date + Times + Participants */}
         <div className={styles.dateRow}>
           <div className={styles.inputGroup}>
             <label className={styles.sectionLabel}>Date</label>
-
-            <input
-              type="date"
-              className={styles.input}
-              value={form.date}
-              onChange={(e) => set("date", e.target.value)}
-            />
+            <input type="date" className={styles.input}
+              value={form.date} onChange={e => set("date", e.target.value)} />
           </div>
-
           <div className={styles.inputGroup}>
             <label className={styles.sectionLabel}>Start</label>
-
-            <input
-              type="time"
-              className={styles.input}
-              value={form.start_time}
-              onChange={(e) => set("start_time", e.target.value)}
-            />
+            <input type="time" className={styles.input}
+              value={form.start_time} onChange={e => set("start_time", e.target.value)} />
           </div>
-
           <div className={styles.inputGroup}>
             <label className={styles.sectionLabel}>End</label>
-
-            <input
-              type="time"
-              className={styles.input}
-              value={form.end_time}
-              onChange={(e) => set("end_time", e.target.value)}
-            />
+            <input type="time" className={styles.input}
+              value={form.end_time} onChange={e => set("end_time", e.target.value)} />
           </div>
         </div>
 
         <div className={styles.inputGroup}>
           <label className={styles.sectionLabel}>Max participants</label>
-
-          <input
-            type="number"
-            className={styles.input}
-            min={1}
+          <input type="number" className={styles.input} min={1}
             value={form.max_participants}
-            onChange={(e) => set("max_participants", e.target.value)}
-          />
+            onChange={e => set("max_participants", e.target.value)} />
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button
-          className={styles.submitBtn}
-          onClick={handleSubmit}
-          disabled={submitting}
-        >
+        <button className={styles.submitBtn} onClick={handleSubmit} disabled={submitting}>
           {submitting ? "Posting..." : "Post Event"}
         </button>
       </div>

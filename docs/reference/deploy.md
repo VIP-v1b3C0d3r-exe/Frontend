@@ -14,7 +14,6 @@
 ## Access to Backend Service
 
 Has access to backend via:
-
 - Domen: `ec2-51-21-218-154.eu-north-1.compute.amazonaws.com`
 - Ip: `51.21.218.154`
 
@@ -29,5 +28,5 @@ ubuntu@ip-172-31-22-14:~/Frontend$ curl 51.21.218.154:8080/health
 - Then receive response from application:
 
 ```json
-{ "data": { "status": "OK" } }
+{"data":{"status":"OK"}}
 ```
