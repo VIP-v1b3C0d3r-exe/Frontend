@@ -1,16 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import Header from "./components/Header/Header";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPassword/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPassword/ResetPasswordPage";
 import EventMapPage from "./pages/MapView/MapPage";
 import EventDetailPage from "./pages/EventDetail/EventDetail";
 import EventPage from "./pages/MyEvents/EventPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
-import { getToken, getRoleFromToken } from "./utils/token";
 import AdminPage from "./pages/Admin/AdminPage";
+
+import { getToken } from "./utils/token";
 
 function AppContent() {
   const location = useLocation();
@@ -22,6 +25,7 @@ function AppContent() {
 
   useEffect(() => {
     const token = getToken();
+
     if (token) {
       setIsLoggedIn(true);
       const savedRole = localStorage.getItem("role");
@@ -29,7 +33,12 @@ function AppContent() {
     }
   }, []);
 
-  const hideHeaderRoutes = ["/login", "/register", "/forgot-password"];
+  const hideHeaderRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ];
 
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
 
@@ -65,12 +74,11 @@ function AppContent() {
         />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route
           path="/map"
-          element={
-            isLoggedIn ? <EventMapPage /> : <Navigate to="/login" replace />
-          }
+          element={isLoggedIn ? <EventMapPage /> : <Navigate to="/login" replace />}
         />
 
         <Route
@@ -79,19 +87,15 @@ function AppContent() {
             isLoggedIn ? <EventDetailPage /> : <Navigate to="/login" replace />
           }
         />
-        
+
         <Route
           path="/my-events"
-          element={
-            isLoggedIn ? <EventPage /> : <Navigate to="/login" replace />
-          }
+          element={isLoggedIn ? <EventPage /> : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/profile"
-          element={
-            isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />
-          }
+          element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />}
         />
 
         <Route

@@ -1,24 +1,34 @@
 .registerPage {
-  min-height: 100vh;
+  height: 100dvh;
   background: #ffffff;
   font-family: "Inter", sans-serif;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
+
+  padding: 20px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .card {
   width: min(92vw, 560px);
+  max-height: calc(100dvh - 40px);
+
   background: #e6e6e6;
   border-radius: 22px;
   padding: clamp(36px, 6vw, 70px);
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
+
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
   animation: cardAppear 0.7s ease both;
+
+  overflow-y: auto;
 }
 
 .avatarUpload {
@@ -145,15 +155,33 @@
 
 @media (max-width: 480px) {
   .registerPage {
-    align-items: flex-start;
-    padding-top: 32px;
+    padding: 16px;
+    align-items: center;
   }
 
   .card {
+    width: 100%;
     border-radius: 18px;
+    padding: 28px 20px;
   }
 
   .submitBtn {
     max-width: 100%;
   }
+}
+
+.errorMessage {
+  width: 100%;
+  max-width: 420px;
+  margin: 0;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.submitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
 }

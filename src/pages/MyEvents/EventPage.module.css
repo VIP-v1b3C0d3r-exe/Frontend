@@ -1,102 +1,176 @@
 /* Page shell */
 .page {
-    min-height: 100vh;
-    background: #e8eae5;
-    font-family: "Georgia", "Times New Roman", serif;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Main content */
+  height: calc(100dvh - 72px);
+  background: #e8eae5;
+  font-family: "Georgia", "Times New Roman", serif;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 20px 80px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(350px, 100%), 1fr));
+  gap: 16px;
+}
+
+/* Card */
+.card {
+  position: relative;
+  border-radius: 12px;
+  padding: 14px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.11);
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  color: #2e3228;
+  line-height: 1.4;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.viewBtn {
+  background: rgba(255, 255, 255, 0.72);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 22px;
+
+  font-size: 14px;
+  font-family: "Georgia", serif;
+  color: #3a3e35;
+
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s;
+
+  flex-shrink: 0;
+  margin-left: 16px;
+  margin-bottom: 9px;
+  align-self: flex-end;
+}
+
+.viewBtn:hover {
+  background: rgba(255, 255, 255, 0.92);
+  transform: scale(1.03);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+
+  margin-top: 28px;
+  padding-bottom: 6px;
+
+  flex-shrink: 0;
+}
+
+.pageBtn {
+  background: none;
+  border: none;
+  font-family: "Georgia", serif;
+  font-size: 15px;
+  color: #4a5545;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: color 0.15s;
+  padding: 0;
+}
+
+.pageBtn:hover {
+  color: #2b2d2b;
+}
+
+@media (max-width: 900px) {
   .main {
-    flex: 1;
-    padding: 20px 80px;
-    display: flex;
-    flex-direction: column;
+    padding: 16px 20px;
   }
-  
-  /* Grid */
+
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
-    gap: 16px;
+    grid-template-columns: 1fr;
   }
-  
-  /* Card */
+}
+
+@media (max-width: 700px) {
+  .page {
+    height: calc(100dvh - 64px);
+  }
+
+  .main {
+    padding: 14px 14px 78px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
   .card {
-    position: relative;
-    border-radius: 12px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    transition: transform 0.15s, box-shadow 0.15s;
+    padding: 14px 16px;
   }
-  
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.11);
-  }
-  
-  .cardInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
-    font-family: "Helvetica Neue", Arial, sans-serif;
-    font-size: 12px;
-    color: #2e3228;
-    line-height: 1.4;
-  }
-  
-  .label {
-    font-weight: 600;
-  }
-  
-  .viewBtn {
-    background: rgba(255,255,255,0.72);
-    border: none;
-    border-radius: 20px;
-    padding: 6px 22px;
-    font-size: 14px;
-    font-family: "Georgia", serif;
-    color: #3a3e35;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s, transform 0.1s;
-    flex-shrink: 0;
-    margin-left: 16px;
-    margin-bottom: 9px;
-    align-self: flex-end;
-  }
-  
-  .viewBtn:hover {
-    background: rgba(255,255,255,0.92);
-    transform: scale(1.03);
-  }
-  
-  /* Pagination */
+
   .pagination {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 16px;
-    margin-top: 28px;
+    justify-content: center;
+    margin-top: 18px;
+    padding-bottom: 0;
   }
-  
-  .pageBtn {
-    background: none;
-    border: none;
-    font-family: "Georgia", serif;
-    font-size: 15px;
-    color: #4a5545;
-    cursor: pointer;
-    letter-spacing: 0.01em;
-    transition: color 0.15s;
-    padding: 0;
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 14px 14px 78px;
   }
-  
-  .pageBtn:hover {
-    color: #2b2d2b;
+
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
-  
+
+  .viewBtn {
+    align-self: flex-start;
+    margin-left: 0;
+    margin-bottom: 0;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+}

@@ -126,21 +126,63 @@
 
 @media (max-width: 700px) {
   .header {
-    padding: 0 16px;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 64px;
+    padding: 0 12px;
+
+    justify-content: space-between;
+    z-index: 10000;
+  }
+
+  .logoLink {
+    flex: 0 0 auto;
+  }
+
+  .logo {
+    width: 42px;
+    height: 42px;
   }
 
   .nav {
-    gap: 16px;
+    flex: 1;
+    height: 64px;
+    justify-content: space-around;
+    gap: 0;
+    margin-left: 12px;
   }
 
   .navLink,
   .profileTrigger {
-    min-width: 44px;
+    height: 64px;
+    min-width: 48px;
+    gap: 4px;
+
     font-size: 11px;
+    letter-spacing: -0.04em;
   }
 
-  .logo {
-    width: 46px;
-    height: 46px;
+  .navLink svg,
+  .profileTrigger svg {
+    font-size: 21px;
+  }
+
+  .profileWrapper {
+    height: 64px;
+  }
+
+  .profileImage {
+    width: 21px;
+    height: 21px;
+  }
+
+  .dropdown {
+    top: auto;
+    bottom: 68px;
+    right: 0;
   }
 }
