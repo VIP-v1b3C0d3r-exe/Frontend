@@ -161,30 +161,6 @@ const EventForm = ({ isOpen, onClose, onCreated, pickedPosition }) => {
 
       <div className={styles.body}>
 
-        {/* Image upload */}
-        <label className={styles.imageUpload}>
-          {imagePreview ? (
-            <img src={imagePreview} alt="preview" className={styles.imagePreview} />
-          ) : (
-            <div className={styles.imagePlaceholder}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21 15 16 10 5 21"/>
-              </svg>
-              <span>Upload cover image</span>
-            </div>
-          )}
-          <input type="file" accept="image/*" onChange={handleImageChange} hidden />
-        </label>
-        {imagePreview && (
-          <button className={styles.imageRemove}
-            onClick={() => { setImageFile(null); setImagePreview(null); }}>
-            Remove photo
-          </button>
-        )}
-
         {/* Title */}
         <input
           className={styles.input}
